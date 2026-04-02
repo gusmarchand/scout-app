@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth'
 import { z } from 'zod'
 import { authOptions } from '@/lib/authOptions'
 import { hasPermission } from '@/lib/auth'
-import { computePriority } from '@/lib/priority'
 import { connectDB } from '@/lib/mongodb'
 import { Item } from '@/models/Item'
 import type { User } from '@/types'
@@ -79,7 +78,7 @@ export async function PATCH(
 
   if (globalStatus !== undefined) {
     item.globalStatus = globalStatus
-    item.priority = computePriority(globalStatus)
+    // Note: priority sera calculé automatiquement par le middleware Mongoose
   }
 
   if (notes !== undefined) {

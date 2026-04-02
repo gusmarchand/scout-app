@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import SessionProviderWrapper from '@/components/SessionProviderWrapper'
 import NavBar from '@/components/NavBar'
+import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
   title: 'Scout Group App',
@@ -33,6 +34,7 @@ export default function RootLayout({
         <SessionProviderWrapper>
           <NavBar />
           {children}
+          <Toaster position="top-right" richColors />
         </SessionProviderWrapper>
       </body>
     </html>

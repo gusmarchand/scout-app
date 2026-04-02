@@ -1,5 +1,6 @@
 import { Schema, model, models, Types, Document } from 'mongoose'
-import type { Item as IItem } from '@/types'
+import type { Item as IItem, Status } from '@/types'
+import { computePriority } from '@/lib/priority'
 
 export type ItemDocument = Omit<IItem, '_id'> & Document
 
@@ -41,6 +42,16 @@ const ItemSchema = new Schema<ItemDocument>(
   },
   { timestamps: false }
 )
+
+// ─── Middleware : calcul automatique de priority ─────────────────────────────
+
+ItemSchema.pre('save', function (next) {
+  // Recalculer priority si globalStatus a changé
+  if (this.isModified('globalStatus')) {
+    this.priority = computePriority(this.globalStatus as Status)
+  }
+  next()
+})
 
 // Index composé pour le tri et la recherche par catégorie
 ItemSchema.index({ categoryId: 1, priority: 1 })

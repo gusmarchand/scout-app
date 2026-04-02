@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import type { Role, Unit } from '@/types'
 
 interface UserSummary {
@@ -108,8 +109,9 @@ export default function AdminUsersPage() {
     const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' })
     if (res.ok) {
       setUsers((prev) => prev.filter((u) => u._id !== userId))
+      toast.success(`Compte de ${userName} supprimé`)
     } else {
-      alert('Erreur lors de la suppression.')
+      toast.error('Erreur lors de la suppression')
     }
   }
 

@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
+import { z } from 'zod'
 import { authOptions } from '@/lib/authOptions'
 import { connectDB } from '@/lib/mongodb'
 import { Item } from '@/models/Item'
 import { Reservation } from '@/models/Reservation'
+
+// ─── Schéma Zod ──────────────────────────────────────────────────────────────
+
+const availableItemsSchema = z.object({
+  categoryId: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
+  start: z.string().datetime(),
+  end: z.string().datetime(),
+}).refine((data) => new Date(data.start) < new Date(data.end), {
+  message: 'La date de début doit être antérieure à la date de fin.',
+  path: ['start'],
+})
 
 // ─── GET /api/reservations/available?categoryId=&start=&end= ─────────────────
 
@@ -15,34 +27,23 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = new URL(req.url)
-  const categoryId = searchParams.get('categoryId')
-  const startParam = searchParams.get('start')
-  const endParam = searchParams.get('end')
+  const params = {
+    categoryId: searchParams.get('categoryId') || undefined,
+    start: searchParams.get('start') || undefined,
+    end: searchParams.get('end') || undefined,
+  }
 
-  // Validation des dates
-  if (!startParam || !endParam) {
+  const parsed = availableItemsSchema.safeParse(params)
+
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Les paramètres start et end sont requis.' },
+      { error: 'Paramètres invalides.', details: parsed.error.flatten() },
       { status: 400 }
     )
   }
 
-  const start = new Date(startParam)
-  const end = new Date(endParam)
-
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-    return NextResponse.json(
-      { error: 'Les dates start et end doivent être valides.' },
-      { status: 400 }
-    )
-  }
-
-  if (start >= end) {
-    return NextResponse.json(
-      { error: 'La date de début doit être antérieure à la date de fin.' },
-      { status: 400 }
-    )
-  }
+  const start = new Date(parsed.data.start)
+  const end = new Date(parsed.data.end)
 
   await connectDB()
 
@@ -60,8 +61,8 @@ export async function GET(req: NextRequest) {
   const baseFilter: Record<string, unknown> = {
     _id: { $nin: reservedItemIds },
   }
-  if (categoryId) {
-    baseFilter.categoryId = categoryId
+  if (parsed.data.categoryId) {
+    baseFilter.categoryId = parsed.data.categoryId
   }
 
   // Items disponibles (ok ou moyen), triés priority ASC puis name ASC

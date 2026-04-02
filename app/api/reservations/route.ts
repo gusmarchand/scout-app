@@ -11,11 +11,18 @@ import type { User } from '@/types'
 // ─── Schéma Zod ──────────────────────────────────────────────────────────────
 
 const createReservationSchema = z.object({
-  itemId: z.string().min(1),
+  itemId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId'),
   itemName: z.string().min(1),
   eventName: z.string().min(1),
-  startDate: z.string().min(1),
-  endDate: z.string().min(1),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
+})
+
+const getReservationsSchema = z.object({
+  itemId: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
+  userId: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
+  start: z.string().datetime().optional(),
+  end: z.string().datetime().optional(),
 })
 
 // ─── POST /api/reservations ───────────────────────────────────────────────────
@@ -97,29 +104,32 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = new URL(req.url)
-  const itemId = searchParams.get('itemId')
-  const userId = searchParams.get('userId')
-  const startParam = searchParams.get('start')
-  const endParam = searchParams.get('end')
+  const params = {
+    itemId: searchParams.get('itemId') || undefined,
+    userId: searchParams.get('userId') || undefined,
+    start: searchParams.get('start') || undefined,
+    end: searchParams.get('end') || undefined,
+  }
+
+  const parsed = getReservationsSchema.safeParse(params)
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Paramètres invalides.', details: parsed.error.flatten() },
+      { status: 400 }
+    )
+  }
 
   const filter: Record<string, unknown> = {}
 
-  if (itemId) filter.itemId = itemId
-  if (userId) filter.reservedBy = userId
+  if (parsed.data.itemId) filter.itemId = parsed.data.itemId
+  if (parsed.data.userId) filter.reservedBy = parsed.data.userId
 
-  if (startParam || endParam) {
+  if (parsed.data.start || parsed.data.end) {
     const dateFilter: Record<string, Date> = {}
-    if (startParam) {
-      const start = new Date(startParam)
-      if (!isNaN(start.getTime())) dateFilter.$gte = start
-    }
-    if (endParam) {
-      const end = new Date(endParam)
-      if (!isNaN(end.getTime())) dateFilter.$lte = end
-    }
-    if (Object.keys(dateFilter).length > 0) {
-      filter.startDate = dateFilter
-    }
+    if (parsed.data.start) dateFilter.$gte = new Date(parsed.data.start)
+    if (parsed.data.end) dateFilter.$lte = new Date(parsed.data.end)
+    filter.startDate = dateFilter
   }
 
   await connectDB()

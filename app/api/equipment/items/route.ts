@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth'
 import { z } from 'zod'
 import { authOptions } from '@/lib/authOptions'
 import { hasPermission } from '@/lib/auth'
-import { computePriority } from '@/lib/priority'
 import { connectDB } from '@/lib/mongodb'
 import { Item } from '@/models/Item'
 import { Category } from '@/models/Category'
@@ -63,14 +62,13 @@ export async function POST(req: NextRequest) {
     photos: [],
   }))
 
-  const priority = computePriority(globalStatus)
+  // Note: priority sera calculé automatiquement par le middleware Mongoose
 
   const item = await Item.create({
     categoryId,
     name,
     type,
     globalStatus,
-    priority,
     components,
     notes: notes ?? '',
     updatedBy,
