@@ -86,6 +86,12 @@ export interface Reservation {
   startDate: Date
   endDate: Date
   createdAt: Date
+  // Champs facultatifs
+  location?: string
+  numberOfGirls?: number
+  numberOfBoys?: number
+  leaders?: Types.ObjectId[]
+  manualLeaders?: string[]
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -138,6 +144,11 @@ export interface CreateReservationInput {
   eventName: string
   startDate: Date
   endDate: Date
+  location?: string
+  numberOfGirls?: number
+  numberOfBoys?: number
+  leaders?: string[]
+  manualLeaders?: string[]
 }
 
 export interface Credentials {

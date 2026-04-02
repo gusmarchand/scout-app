@@ -16,6 +16,12 @@ const ReservationSchema = new Schema<ReservationDocument>(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     createdAt: { type: Date, default: Date.now },
+    // Champs facultatifs
+    location: { type: String, trim: true },
+    numberOfGirls: { type: Number, min: 0 },
+    numberOfBoys: { type: Number, min: 0 },
+    leaders: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    manualLeaders: [{ type: String, trim: true }], // Chefs ajoutés manuellement (non inscrits)
   },
   { timestamps: false }
 )

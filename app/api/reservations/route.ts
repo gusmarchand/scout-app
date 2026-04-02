@@ -14,8 +14,14 @@ const createReservationSchema = z.object({
   itemId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId'),
   itemName: z.string().min(1),
   eventName: z.string().min(1),
-  startDate: z.string().datetime(),
-  endDate: z.string().datetime(),
+  startDate: z.string().min(1),
+  endDate: z.string().min(1),
+  unit: z.string().optional(),
+  location: z.string().optional(),
+  numberOfGirls: z.number().int().min(0).optional(),
+  numberOfBoys: z.number().int().min(0).optional(),
+  leaders: z.array(z.string().regex(/^[0-9a-fA-F]{24}$/)).optional(),
+  manualLeaders: z.array(z.string()).optional(),
 })
 
 const getReservationsSchema = z.object({
@@ -48,7 +54,19 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const { itemId, itemName, eventName, startDate: startStr, endDate: endStr } = parsed.data
+  const {
+    itemId,
+    itemName,
+    eventName,
+    startDate: startStr,
+    endDate: endStr,
+    unit: bodyUnit,
+    location,
+    numberOfGirls,
+    numberOfBoys,
+    leaders,
+    manualLeaders
+  } = parsed.data
   const startDate = new Date(startStr)
   const endDate = new Date(endStr)
 
@@ -78,7 +96,7 @@ export async function POST(req: NextRequest) {
   await connectDB()
 
   const reservedBy = session.user.id
-  const unit = session.user.role === 'chef' ? session.user.unit : undefined
+  const unit = bodyUnit ?? (session.user.role === 'chef' ? session.user.unit : undefined)
 
   const reservation = await Reservation.create({
     itemId,
@@ -89,6 +107,11 @@ export async function POST(req: NextRequest) {
     startDate,
     endDate,
     createdAt: new Date(),
+    location,
+    numberOfGirls,
+    numberOfBoys,
+    leaders,
+    manualLeaders,
   })
 
   return NextResponse.json(reservation.toObject(), { status: 201 })

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { DayPicker, type DateRange } from 'react-day-picker'
@@ -34,6 +34,13 @@ export default function NewReservationPage() {
 
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([])
   const [eventName, setEventName] = useState('')
+  const [location, setLocation] = useState('')
+  const [numberOfGirls, setNumberOfGirls] = useState('')
+  const [numberOfBoys, setNumberOfBoys] = useState('')
+  const [selectedLeaderIds, setSelectedLeaderIds] = useState<string[]>([])
+  const [manualLeaders, setManualLeaders] = useState<string[]>([])
+  const [manualLeaderInput, setManualLeaderInput] = useState('')
+  const [allUsers, setAllUsers] = useState<any[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const [submitSuccess, setSubmitSuccess] = useState(false)
@@ -45,6 +52,37 @@ export default function NewReservationPage() {
         : [...prev, itemId]
     )
   }
+
+  function addManualLeader() {
+    if (manualLeaderInput.trim()) {
+      setManualLeaders(prev => [...prev, manualLeaderInput.trim()])
+      setManualLeaderInput('')
+    }
+  }
+
+  function removeManualLeader(index: number) {
+    setManualLeaders(prev => prev.filter((_, i) => i !== index))
+  }
+
+  // Charger la liste des utilisateurs pour la sélection des chefs (role=chef uniquement)
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const res = await fetch('/api/users')
+        if (res.ok) {
+          const data = await res.json()
+          // Filtrer uniquement les chefs
+          const chefs = data.filter((user: any) => user.role === 'chef')
+          setAllUsers(chefs)
+        }
+      } catch (error) {
+        console.error('Erreur chargement utilisateurs:', error)
+      }
+    }
+    if (session) {
+      fetchUsers()
+    }
+  }, [session])
 
   if (status === 'loading') return null
   if (!session) { router.replace('/login'); return null }
@@ -94,6 +132,11 @@ export default function NewReservationPage() {
       startDate,
       endDate,
       unit: session?.user.unit ?? undefined,
+      location: location.trim() || undefined,
+      numberOfGirls: numberOfGirls ? parseInt(numberOfGirls, 10) : undefined,
+      numberOfBoys: numberOfBoys ? parseInt(numberOfBoys, 10) : undefined,
+      leaders: selectedLeaderIds.length > 0 ? selectedLeaderIds : undefined,
+      manualLeaders: manualLeaders.length > 0 ? manualLeaders : undefined,
     }))
 
     try {
@@ -240,16 +283,117 @@ export default function NewReservationPage() {
       {searched && availableItems.length > 0 && (
         <section className="bg-white rounded-xl shadow p-5">
           <h2 className="text-base font-semibold text-gray-800 mb-3">Confirmer la réservation</h2>
-          <form onSubmit={handleReserve} className="flex flex-col gap-3">
+          <form onSubmit={handleReserve} className="flex flex-col gap-4">
+            {/* Nom de l'événement */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nom de l&apos;événement
+                Nom de l&apos;événement <span className="text-red-500">*</span>
               </label>
               <input type="text" value={eventName} onChange={e => setEventName(e.target.value)}
                 required placeholder="Ex : Camp d'été 2025"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
+
+            {/* Lieu */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Lieu <span className="text-xs text-gray-500">(facultatif)</span>
+              </label>
+              <input type="text" value={location} onChange={e => setLocation(e.target.value)}
+                placeholder="Ex : Base de Kerloc'h"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+
+            {/* Nombre d'enfants */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nombre de filles <span className="text-xs text-gray-500">(facultatif)</span>
+                </label>
+                <input type="number" min="0" value={numberOfGirls} onChange={e => setNumberOfGirls(e.target.value)}
+                  placeholder="0"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nombre de garçons <span className="text-xs text-gray-500">(facultatif)</span>
+                </label>
+                <input type="number" min="0" value={numberOfBoys} onChange={e => setNumberOfBoys(e.target.value)}
+                  placeholder="0"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+            </div>
+
+            {/* Chefs présents */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Chefs présents <span className="text-xs text-gray-500">(facultatif)</span>
+              </label>
+              {allUsers.length > 0 && (
+                <div className="mb-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2">
+                  {allUsers.map(user => (
+                    <label key={user._id} className="flex items-center gap-2 py-1 hover:bg-gray-50 px-2 rounded cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedLeaderIds.includes(user._id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedLeaderIds(prev => [...prev, user._id])
+                          } else {
+                            setSelectedLeaderIds(prev => prev.filter(id => id !== user._id))
+                          }
+                        }}
+                        className="accent-[#0b7152]"
+                      />
+                      <span className="text-sm">{user.name}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              {/* Ajouter un chef manuellement */}
+              <div className="mt-2">
+                <label className="block text-xs text-gray-600 mb-1">Ajouter un chef non inscrit</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={manualLeaderInput}
+                    onChange={e => setManualLeaderInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addManualLeader() } }}
+                    placeholder="Nom du chef"
+                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={addManualLeader}
+                    className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200"
+                  >
+                    + Ajouter
+                  </button>
+                </div>
+                {manualLeaders.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {manualLeaders.map((leader, index) => (
+                      <span key={index} className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">
+                        {leader}
+                        <button
+                          type="button"
+                          onClick={() => removeManualLeader(index)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
             {submitError && (
               <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
                 {submitError}
