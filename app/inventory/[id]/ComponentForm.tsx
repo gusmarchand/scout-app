@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import type { Component, Status } from '@/types'
 
 interface Props {
@@ -9,6 +11,7 @@ interface Props {
 }
 
 export default function ComponentForm({ itemId, component }: Props) {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState<Status>(component.status)
   const [quantity, setQuantity] = useState(component.quantity ?? '')
@@ -16,12 +19,9 @@ export default function ComponentForm({ itemId, component }: Props) {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+  async function saveComponent(body: Record<string, unknown>) {
     setSaving(true)
     setMessage('')
-    const body: Record<string, unknown> = { status, notes }
-    if (component.quantity !== undefined) body.quantity = Number(quantity)
     const res = await fetch(`/api/equipment/items/${itemId}/components/${component.key}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -30,12 +30,31 @@ export default function ComponentForm({ itemId, component }: Props) {
     setSaving(false)
     if (res.ok) {
       setMessage('Composant mis à jour.')
-      setOpen(false)
+      toast.success('Composant mis à jour')
+      router.refresh()
+      return true
     } else {
       const err = await res.json().catch(() => ({}))
       setMessage(err.error ?? 'Erreur.')
+      toast.error(err.error ?? 'Erreur lors de la mise à jour')
+      return false
     }
   }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const body: Record<string, unknown> = { status, notes }
+    if (component.quantity !== undefined) body.quantity = Number(quantity)
+    const success = await saveComponent(body)
+    if (success) setOpen(false)
+  }
+
+  // Auto-save when status changes
+  useEffect(() => {
+    if (status !== component.status) {
+      saveComponent({ status, notes })
+    }
+  }, [status])
 
   const statusColor: Record<Status, string> = {
     ok: 'text-logo-green',
