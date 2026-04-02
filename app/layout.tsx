@@ -3,6 +3,7 @@ import './globals.css'
 import SessionProviderWrapper from '@/components/SessionProviderWrapper'
 import QueryProvider from '@/components/QueryProvider'
 import NavBar from '@/components/NavBar'
+import KeyboardShortcuts from '@/components/KeyboardShortcuts'
 import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
@@ -42,6 +43,7 @@ export default function RootLayout({
         <QueryProvider>
           <SessionProviderWrapper>
             <NavBar />
+            <KeyboardShortcuts />
             {children}
             <Toaster position="top-right" richColors />
           </SessionProviderWrapper>

@@ -76,7 +76,7 @@ export default function NavBar() {
           ref={buttonRef}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="md:hidden p-2 rounded hover:bg-white/10 transition-colors relative z-50"
-          aria-label="Menu"
+          aria-label={mobileMenuOpen ? "Fermer le menu" : "Menu"}
         >
           <svg
             className="w-6 h-6"
@@ -106,6 +106,7 @@ export default function NavBar() {
       {/* Mobile Menu - Overlay with smooth animation */}
       <div
         ref={menuRef}
+        data-mobile-menu="true"
         className={`md:hidden absolute top-full left-0 right-0 bg-logo-navy border-t border-white/20 shadow-lg z-40 overflow-hidden transition-all duration-300 ease-in-out ${
           mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         }`}

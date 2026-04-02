@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary'
 import type { Photo } from '@/types'
@@ -16,10 +16,44 @@ export default function PhotoSection({ itemId, componentKey, photos: initialPhot
   const [photos, setPhotos] = useState<Photo[]>(initialPhotos)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
-  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+
+    setError('')
+    setSelectedFile(file)
+
+    // Créer l'URL de preview
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+
+    e.target.value = ''
+  }
+
+  function cancelPreview() {
+    setPreviewUrl(null)
+    setSelectedFile(null)
+  }
+
+  // Support Escape key to close preview
+  useEffect(() => {
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === 'Escape' && previewUrl) {
+        cancelPreview()
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [previewUrl])
+
+  async function confirmUpload() {
+    if (!selectedFile) return
     setUploading(true)
     setError('')
 
@@ -33,7 +67,7 @@ export default function PhotoSection({ itemId, componentKey, photos: initialPhot
 
       // 2. Upload vers Cloudinary
       const formData = new FormData()
-      formData.append('file', file)
+      formData.append('file', selectedFile)
       formData.append('signature', signature)
       formData.append('timestamp', String(timestamp))
       formData.append('api_key', apiKey)
@@ -61,11 +95,14 @@ export default function PhotoSection({ itemId, componentKey, photos: initialPhot
       if (!saveRes.ok) throw new Error('Erreur lors de l\'enregistrement.')
       const saved = await saveRes.json()
       setPhotos(saved.photos ?? [...photos, { url: uploadData.secure_url, publicId: uploadData.public_id }])
+
+      // Reset preview
+      setPreviewUrl(null)
+      setSelectedFile(null)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue.')
     } finally {
       setUploading(false)
-      e.target.value = ''
     }
   }
 
@@ -110,17 +147,47 @@ export default function PhotoSection({ itemId, componentKey, photos: initialPhot
           ))}
         </div>
       )}
-      {canEdit && (
+
+      {/* Preview modal */}
+      {previewUrl && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 max-w-lg w-full">
+            <h3 className="text-lg font-semibold mb-3">Aperçu de la photo</h3>
+            <img
+              src={previewUrl}
+              alt="Preview"
+              className="w-full h-auto rounded mb-4 max-h-96 object-contain"
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={cancelPreview}
+                disabled={uploading}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 disabled:opacity-50"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={confirmUpload}
+                disabled={uploading}
+                className="px-4 py-2 bg-logo-green text-white rounded text-sm hover:bg-logo-green-hover disabled:opacity-50"
+              >
+                {uploading ? 'Upload en cours…' : 'Confirmer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {canEdit && !previewUrl && (
         <label className="inline-flex items-center gap-2 cursor-pointer">
           <span className="bg-white border border-gray-300 text-gray-700 text-xs px-3 py-1 rounded hover:bg-gray-50">
-            {uploading ? 'Upload en cours…' : '+ Ajouter une photo'}
+            + Ajouter une photo
           </span>
           <input
             type="file"
             accept="image/*"
             className="hidden"
-            onChange={handleUpload}
-            disabled={uploading}
+            onChange={handleFileSelect}
           />
         </label>
       )}

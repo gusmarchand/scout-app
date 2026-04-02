@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import StatusBadge from './StatusBadge'
+import ExportButton from './ExportButton'
 import type { Status } from '@/types'
 
 interface ItemSummary {
@@ -119,14 +120,19 @@ export default function InventoryClient({ categories, initialItems, initialCateg
 
   return (
     <div>
-      {/* Barre de recherche */}
-      <div className="mb-4">
+      {/* Barre de recherche et export */}
+      <div className="mb-4 flex gap-2">
         <input
-          type="text"
-          placeholder="🔍 Rechercher un item..."
+          type="search"
+          placeholder="🔍 Rechercher un item... (raccourci: /)"
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0b7152] text-sm"
+          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0b7152] text-sm"
+        />
+        <ExportButton
+          categoryId={selectedCategory}
+          statusFilter={statusFilter}
+          searchQuery={debouncedSearch}
         />
       </div>
 

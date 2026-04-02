@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
   const sortBy = searchParams.get('sortBy') || 'name'
   const sortOrder = searchParams.get('sortOrder') || 'asc'
   const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
-  const limit = 20
+  const limit = Math.min(10000, parseInt(searchParams.get('limit') ?? '20', 10)) // Max 10k items
   const skip = (page - 1) * limit
 
   await connectDB()

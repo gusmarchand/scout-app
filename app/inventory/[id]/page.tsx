@@ -9,6 +9,9 @@ import StatusBadge from '../StatusBadge'
 import ItemStatusForm from './ItemStatusForm'
 import ComponentForm from './ComponentForm'
 import PhotoSection from './PhotoSection'
+import DeleteButton from './DeleteButton'
+import CopyButton from './CopyButton'
+import QRCodeButton from './QRCodeButton'
 import type { Item, Component} from '@/types'
 
 async function getItem(id: string): Promise<Item | null> {
@@ -45,12 +48,19 @@ export default async function ItemDetailPage(props: { params: Promise<{ id: stri
           <StatusBadge status={item.globalStatus} />
         </div>
         {canEdit && (
-          <Link
-            href={`/inventory/${item._id}/edit`}
-            className="px-4 py-2 bg-logo-green text-white rounded-lg text-sm font-medium bg-logo-green-hover transition-colors"
-          >
-            ✏️ Modifier l'item
-          </Link>
+          <div className="flex items-center gap-2">
+            <QRCodeButton itemId={String(item._id)} itemName={item.name} />
+            <CopyButton itemId={String(item._id)} itemName={item.name} />
+            <Link
+              href={`/inventory/${item._id}/edit`}
+              className="px-4 py-2 bg-logo-green text-white rounded-lg text-sm font-medium bg-logo-green-hover transition-colors"
+            >
+              ✏️ Modifier
+            </Link>
+            {session.user.role === 'admin' && (
+              <DeleteButton itemId={String(item._id)} itemName={item.name} />
+            )}
+          </div>
         )}
       </div>
       {item.notes && <p className="text-sm text-gray-600 mb-6">{item.notes}</p>}
