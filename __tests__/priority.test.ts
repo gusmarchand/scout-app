@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { computePriority } from '../lib/priority'
-import type { Status } from '../types'
+import { computePriority, computeGlobalStatus } from '../lib/priority'
+import type { Status, Component } from '../types'
 
 describe('computePriority', () => {
   it('should return 1 for ok status', () => {
@@ -23,5 +23,70 @@ describe('computePriority', () => {
     for (let i = 1; i < priorities.length; i++) {
       expect(priorities[i]).toBeGreaterThan(priorities[i - 1])
     }
+  })
+})
+
+describe('computeGlobalStatus', () => {
+  const createComponent = (key: string, status: Status): Component => ({
+    key,
+    label: `Component ${key}`,
+    status,
+    notes: '',
+  })
+
+  it('should return "ok" for empty components array', () => {
+    expect(computeGlobalStatus([])).toBe('ok')
+  })
+
+  it('should return "ok" when all components are ok', () => {
+    const components = [
+      createComponent('c1', 'ok'),
+      createComponent('c2', 'ok'),
+      createComponent('c3', 'ok'),
+    ]
+    expect(computeGlobalStatus(components)).toBe('ok')
+  })
+
+  it('should return "moyen" when at least one component is moyen and none are ko', () => {
+    const components = [
+      createComponent('c1', 'ok'),
+      createComponent('c2', 'moyen'),
+      createComponent('c3', 'ok'),
+    ]
+    expect(computeGlobalStatus(components)).toBe('moyen')
+  })
+
+  it('should return "ko" when at least one component is ko', () => {
+    const components = [
+      createComponent('c1', 'ok'),
+      createComponent('c2', 'moyen'),
+      createComponent('c3', 'ko'),
+    ]
+    expect(computeGlobalStatus(components)).toBe('ko')
+  })
+
+  it('should return "ko" when all components are ko', () => {
+    const components = [
+      createComponent('c1', 'ko'),
+      createComponent('c2', 'ko'),
+    ]
+    expect(computeGlobalStatus(components)).toBe('ko')
+  })
+
+  it('should return "moyen" when all components are moyen', () => {
+    const components = [
+      createComponent('c1', 'moyen'),
+      createComponent('c2', 'moyen'),
+    ]
+    expect(computeGlobalStatus(components)).toBe('moyen')
+  })
+
+  it('should prioritize ko over moyen', () => {
+    const components = [
+      createComponent('c1', 'moyen'),
+      createComponent('c2', 'ko'),
+      createComponent('c3', 'moyen'),
+    ]
+    expect(computeGlobalStatus(components)).toBe('ko')
   })
 })

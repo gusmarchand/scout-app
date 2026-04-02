@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/authOptions'
 import { hasPermission } from '@/lib/auth'
 import { connectDB } from '@/lib/mongodb'
 import { Item } from '@/models/Item'
+import { computeGlobalStatus } from '@/lib/priority'
 import type { User } from '@/types'
 
 // ─── Schéma Zod ──────────────────────────────────────────────────────────────
@@ -63,6 +64,10 @@ export async function PATCH(
   if (quantity !== undefined) component.quantity = quantity
   if (quantityExpected !== undefined) component.quantityExpected = quantityExpected
   if (notes !== undefined) component.notes = notes
+
+  // Recalcule automatiquement le statut global de l'item basé sur le statut le plus critique des composants
+  const newGlobalStatus = computeGlobalStatus(item.components)
+  item.globalStatus = newGlobalStatus
 
   await item.save()
 
