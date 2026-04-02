@@ -2,11 +2,31 @@
 
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export default function NavBar() {
   const { data: session } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  // Fermer le menu quand on clique à l'extérieur
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        mobileMenuOpen &&
+        menuRef.current &&
+        buttonRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setMobileMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [mobileMenuOpen])
 
   if (!session) return null
 
@@ -53,6 +73,7 @@ export default function NavBar() {
 
         {/* Mobile Burger Button */}
         <button
+          ref={buttonRef}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="md:hidden p-2 rounded hover:bg-white/10 transition-colors relative z-50"
           aria-label="Menu"
@@ -84,6 +105,7 @@ export default function NavBar() {
 
       {/* Mobile Menu - Overlay with smooth animation */}
       <div
+        ref={menuRef}
         className={`md:hidden absolute top-full left-0 right-0 bg-logo-navy border-t border-white/20 shadow-lg z-40 overflow-hidden transition-all duration-300 ease-in-out ${
           mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         }`}
