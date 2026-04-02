@@ -121,7 +121,7 @@ export default function NewItemPage() {
     <main className="max-w-2xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Ajouter du matériel</h1>
-        <button onClick={() => router.push('/inventory')} className="text-sm text-green-700 hover:underline">
+        <button onClick={() => router.push('/inventory')} className="text-sm text-logo-green hover:underline">
           ← Retour à l&apos;inventaire
         </button>
       </div>
@@ -129,7 +129,7 @@ export default function NewItemPage() {
       <div className="flex gap-2 mb-6">
         {(['item', 'category'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${tab === t ? 'bg-green-700 text-white' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium ${tab === t ? 'bg-logo-green text-white' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'}`}
           >
             {t === 'item' ? 'Nouvel équipement' : 'Nouvelle catégorie'}
           </button>
@@ -169,7 +169,7 @@ export default function NewItemPage() {
                     {(['classique', 'bateau', 'autre'] as TentType[]).map(t => (
                       <label key={t} className="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="tentType" value={t} checked={tentType === t}
-                          onChange={() => setTentType(t)} className="accent-green-700"
+                          onChange={() => setTentType(t)} className="accent-[#0b7152]"
                         />
                         <span className="text-sm capitalize">{t}</span>
                       </label>
@@ -189,7 +189,7 @@ export default function NewItemPage() {
                       {(['6', '8'] as const).map(p => (
                         <label key={p} className="flex items-center gap-2 cursor-pointer">
                           <input type="radio" name="tentPlaces" value={p} checked={tentPlaces === p}
-                            onChange={() => setTentPlaces(p)} className="accent-green-700"
+                            onChange={() => setTentPlaces(p)} className="accent-[#0b7152]"
                           />
                           <span className="text-sm">{p} places</span>
                         </label>
@@ -227,9 +227,9 @@ export default function NewItemPage() {
             </div>
 
             {itemError && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">{itemError}</p>}
-            {itemSuccess && <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded px-3 py-2">{itemSuccess}</p>}
+            {itemSuccess && <p className="text-sm text-logo-green bg-green-50 border border-green-200 rounded px-3 py-2">{itemSuccess}</p>}
             <button type="submit" disabled={savingItem || categories.length === 0}
-              className="self-start bg-green-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-800 disabled:opacity-50"
+              className="self-start bg-logo-green text-white px-4 py-2 rounded-lg text-sm bg-logo-green-hover disabled:opacity-50"
             >
               {savingItem ? 'Création…' : "Ajouter l'équipement"}
             </button>
@@ -275,15 +275,15 @@ export default function NewItemPage() {
               </div>
               <button type="button"
                 onClick={() => setComponents([...components, { key: '', label: '', isQuantified: false }])}
-                className="mt-2 text-sm text-green-700 hover:underline"
+                className="mt-2 text-sm text-logo-green hover:underline"
               >
                 + Ajouter un composant
               </button>
             </div>
             {catError && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">{catError}</p>}
-            {catSuccess && <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded px-3 py-2">{catSuccess}</p>}
+            {catSuccess && <p className="text-sm text-logo-green bg-green-50 border border-green-200 rounded px-3 py-2">{catSuccess}</p>}
             <button type="submit" disabled={savingCat}
-              className="self-start bg-green-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-800 disabled:opacity-50"
+              className="self-start bg-logo-green text-white px-4 py-2 rounded-lg text-sm bg-logo-green-hover disabled:opacity-50"
             >
               {savingCat ? 'Création…' : 'Créer la catégorie'}
             </button>

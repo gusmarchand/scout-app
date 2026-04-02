@@ -31,7 +31,7 @@ async function getDashboardData(role: string, userId: string, unit?: string | nu
 }
 
 const UNIT_BADGE: Record<string, { label: string; className: string }> = {
-  'farfadets':             { label: 'Farfa',   className: 'bg-green-100 text-green-700' },
+  'farfadets':             { label: 'Farfa',   className: 'bg-green-100 text-logo-green' },
   'louveteaux-jeannettes': { label: 'LJ',      className: 'bg-orange-100 text-orange-700' },
   'scouts-guides':         { label: 'SG',      className: 'bg-blue-100 text-blue-900' },
   'pionniers-caravelles':  { label: 'PK',      className: 'bg-red-100 text-red-700' },
@@ -122,7 +122,7 @@ export default async function HomePage() {
                   {(data as any).alertItems.map((item: any) => (
                     <li key={String(item._id)} className="py-2 flex items-center justify-between">
                       <Link href={`/inventory/${item._id}`}
-                        className="text-sm font-medium text-gray-900 hover:text-green-700"
+                        className="text-sm font-medium text-gray-900 hover:text-logo-green"
                       >
                         {item.name}
                       </Link>
@@ -141,13 +141,13 @@ export default async function HomePage() {
             <h2 className="text-base font-semibold text-gray-800 mb-3">Accès rapide</h2>
             <div className="flex flex-wrap gap-3">
               <Link href="/inventory"
-                className="bg-green-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-800"
+                className="bg-logo-green text-white px-4 py-2 rounded-lg text-sm bg-logo-green-hover"
               >
                 📦 Inventaire
               </Link>
               {(role === 'admin' || role === 'equipier') && (
                 <Link href="/inventory/new"
-                  className="bg-white border border-green-700 text-green-700 px-4 py-2 rounded-lg text-sm hover:bg-green-50"
+                  className="bg-white border border-logo-green text-logo-green px-4 py-2 rounded-lg text-sm hover:bg-green-50"
                 >
                   + Ajouter du matériel
                 </Link>
@@ -224,7 +224,7 @@ export default async function HomePage() {
             <h2 className="text-base font-semibold text-gray-800 mb-3">Accès rapide</h2>
             <div className="flex flex-wrap gap-3">
               <Link href="/reservations/new"
-                className="bg-green-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-800"
+                className="bg-logo-green text-white px-4 py-2 rounded-lg text-sm bg-logo-green-hover"
               >
                 📅 Nouvelle réservation
               </Link>

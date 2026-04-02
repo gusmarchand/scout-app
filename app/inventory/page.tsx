@@ -40,7 +40,7 @@ export default async function InventoryPage() {
         {(session.user.role === 'admin' || session.user.role === 'equipier') && (
           <Link
             href="/inventory/new"
-            className="bg-green-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-800"
+            className="bg-logo-green text-white px-4 py-2 rounded-lg text-sm bg-logo-green-hover"
           >
             + Ajouter
           </Link>

@@ -60,12 +60,12 @@ export default function ItemStatusForm({ itemId, currentStatus, currentNotes }: 
         />
       </div>
       {message && (
-        <p className="text-sm text-green-700">{message}</p>
+        <p className="text-sm text-logo-green">{message}</p>
       )}
       <button
         type="submit"
         disabled={saving}
-        className="self-start bg-green-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-800 disabled:opacity-50"
+        className="self-start bg-logo-green text-white px-4 py-2 rounded-lg text-sm bg-logo-green-hover disabled:opacity-50"
       >
         {saving ? 'Enregistrement…' : 'Enregistrer'}
       </button>

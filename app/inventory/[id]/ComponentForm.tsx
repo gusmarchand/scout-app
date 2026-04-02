@@ -38,7 +38,7 @@ export default function ComponentForm({ itemId, component }: Props) {
   }
 
   const statusColor: Record<Status, string> = {
-    ok: 'text-green-700',
+    ok: 'text-logo-green',
     moyen: 'text-orange-600',
     ko: 'text-red-600',
   }
@@ -60,7 +60,7 @@ export default function ComponentForm({ itemId, component }: Props) {
         </div>
         <button
           onClick={() => setOpen(!open)}
-          className="text-xs text-green-700 hover:underline"
+          className="text-xs text-logo-green hover:underline"
         >
           {open ? 'Fermer' : 'Modifier'}
         </button>
@@ -105,11 +105,11 @@ export default function ComponentForm({ itemId, component }: Props) {
               className="border border-gray-300 rounded px-2 py-1 text-xs w-full focus:outline-none focus:ring-1 focus:ring-green-500"
             />
           </div>
-          {message && <p className="text-xs text-green-700">{message}</p>}
+          {message && <p className="text-xs text-logo-green">{message}</p>}
           <button
             type="submit"
             disabled={saving}
-            className="self-start bg-green-700 text-white px-3 py-1 rounded text-xs hover:bg-green-800 disabled:opacity-50"
+            className="self-start bg-logo-green text-white px-3 py-1 rounded text-xs bg-logo-green-hover disabled:opacity-50"
           >
             {saving ? 'Enregistrement…' : 'Enregistrer'}
           </button>

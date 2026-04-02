@@ -9,7 +9,7 @@ export default function NavBar() {
   if (!session) return null
 
   return (
-    <nav className="bg-green-700 text-white px-4 py-3 flex items-center justify-between shadow">
+    <nav className="bg-logo-navy text-white px-4 py-3 flex items-center justify-between shadow">
       <div className="flex items-center gap-6">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg tracking-tight">
           <img
@@ -35,7 +35,7 @@ export default function NavBar() {
         <span className="opacity-80">{session.user.name}</span>
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
-          className="bg-white text-green-700 px-3 py-1 rounded hover:bg-green-100 font-medium"
+          className="bg-white text-logo-green px-3 py-1 rounded hover:bg-gray-100 font-medium"
         >
           Déconnexion
         </button>

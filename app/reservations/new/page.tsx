@@ -106,13 +106,13 @@ export default function NewReservationPage() {
   if (submitSuccess) {
     return (
       <main className="max-w-2xl mx-auto px-4 py-8 text-center">
-        <p className="text-green-700 text-lg font-semibold mb-4">✅ Réservation confirmée !</p>
+        <p className="text-logo-green text-lg font-semibold mb-4">✅ Réservation confirmée !</p>
         <button
           onClick={() => {
             setSubmitSuccess(false); setSelectedItemId(''); setEventName('')
             setAvailableItems([]); setSearched(false); setRange(undefined)
           }}
-          className="text-sm text-green-700 hover:underline"
+          className="text-sm text-logo-green hover:underline"
         >
           Faire une autre réservation
         </button>
@@ -157,7 +157,7 @@ export default function NewReservationPage() {
           <button
             type="submit"
             disabled={loadingAvail || !startDate || !endDate}
-            className="self-center bg-green-700 text-white px-5 py-2 rounded-lg text-sm hover:bg-green-800 disabled:opacity-50"
+            className="self-center bg-logo-green text-white px-5 py-2 rounded-lg text-sm bg-logo-green-hover disabled:opacity-50"
           >
             {loadingAvail ? 'Recherche…' : 'Voir les disponibilités'}
           </button>
@@ -178,7 +178,7 @@ export default function NewReservationPage() {
                   <li key={item._id} className="py-2 flex items-center gap-3">
                     <input type="radio" name="selectedItem" value={item._id}
                       id={`item-${item._id}`} checked={selectedItemId === item._id}
-                      onChange={() => setSelectedItemId(item._id)} className="accent-green-700"
+                      onChange={() => setSelectedItemId(item._id)} className="accent-[#0b7152]"
                     />
                     <label htmlFor={`item-${item._id}`} className="flex-1 cursor-pointer">
                       <span className="font-medium text-sm">{item.name}</span>
@@ -218,7 +218,7 @@ export default function NewReservationPage() {
               </p>
             )}
             <button type="submit" disabled={submitting || !selectedItemId}
-              className="self-start bg-green-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-800 disabled:opacity-50"
+              className="self-start bg-logo-green text-white px-4 py-2 rounded-lg text-sm bg-logo-green-hover disabled:opacity-50"
             >
               {submitting ? 'Réservation en cours…' : 'Confirmer la réservation'}
             </button>

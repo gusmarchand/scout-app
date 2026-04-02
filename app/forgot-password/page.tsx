@@ -28,17 +28,17 @@ export default function ForgotPasswordPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-sm bg-white rounded-xl shadow p-8">
-        <h1 className="text-xl font-bold text-green-700 mb-2 text-center">Mot de passe oublié</h1>
+        <h1 className="text-xl font-bold text-logo-green mb-2 text-center">Mot de passe oublié</h1>
         <p className="text-sm text-gray-500 text-center mb-6">
           Saisis ton adresse email pour recevoir un lien de réinitialisation.
         </p>
 
         {message ? (
           <div className="text-center">
-            <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded px-3 py-3 mb-4">
+            <p className="text-sm text-logo-green bg-green-50 border border-green-200 rounded px-3 py-3 mb-4">
               {message}
             </p>
-            <Link href="/login" className="text-sm text-green-700 hover:underline">
+            <Link href="/login" className="text-sm text-logo-green hover:underline">
               Retour à la connexion
             </Link>
           </div>
@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
               </p>
             )}
             <button type="submit" disabled={loading}
-              className="bg-green-700 text-white rounded-lg py-2 font-medium hover:bg-green-800 disabled:opacity-50"
+              className="bg-logo-green text-white rounded-lg py-2 font-medium bg-logo-green-hover disabled:opacity-50"
             >
               {loading ? 'Envoi…' : 'Envoyer le lien'}
             </button>

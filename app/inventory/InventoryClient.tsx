@@ -74,7 +74,7 @@ export default function InventoryClient({ categories, initialItems, initialCateg
           onClick={() => handleCategoryChange('')}
           className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
             selectedCategory === ''
-              ? 'bg-green-700 text-white border-green-700'
+              ? 'bg-logo-green text-white border-logo-green'
               : 'bg-white text-gray-700 border-gray-300 hover:border-green-500'
           }`}
         >
@@ -86,7 +86,7 @@ export default function InventoryClient({ categories, initialItems, initialCateg
             onClick={() => handleCategoryChange(cat._id)}
             className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
               selectedCategory === cat._id
-                ? 'bg-green-700 text-white border-green-700'
+                ? 'bg-logo-green text-white border-logo-green'
                 : 'bg-white text-gray-700 border-gray-300 hover:border-green-500'
             }`}
           >

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'Matos Alice Gillig',
   description: 'Gestion du matériel de camp - Groupe Alice Gillig',
   manifest: '/manifest.json',
-  themeColor: '#15803d',
+  themeColor: '#0a3a5b',
   icons: {
     icon: [
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#15803d',
+  themeColor: '#0a3a5b',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',

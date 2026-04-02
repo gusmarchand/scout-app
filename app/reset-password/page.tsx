@@ -48,7 +48,7 @@ function ResetForm() {
 
   if (success) {
     return (
-      <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded px-3 py-3 text-center">
+      <p className="text-sm text-logo-green bg-green-50 border border-green-200 rounded px-3 py-3 text-center">
         Mot de passe mis à jour. Redirection…
       </p>
     )
@@ -76,7 +76,7 @@ function ResetForm() {
         <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">{error}</p>
       )}
       <button type="submit" disabled={loading}
-        className="bg-green-700 text-white rounded-lg py-2 font-medium hover:bg-green-800 disabled:opacity-50"
+        className="bg-logo-green text-white rounded-lg py-2 font-medium bg-logo-green-hover disabled:opacity-50"
       >
         {loading ? 'Mise à jour…' : 'Changer le mot de passe'}
       </button>
@@ -88,7 +88,7 @@ export default function ResetPasswordPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-sm bg-white rounded-xl shadow p-8">
-        <h1 className="text-xl font-bold text-green-700 mb-6 text-center">Nouveau mot de passe</h1>
+        <h1 className="text-xl font-bold text-logo-green mb-6 text-center">Nouveau mot de passe</h1>
         <Suspense fallback={<p className="text-sm text-gray-500 text-center">Chargement…</p>}>
           <ResetForm />
         </Suspense>

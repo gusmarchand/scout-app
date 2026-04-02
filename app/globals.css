@@ -1,3 +1,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  /* Couleurs du logo Alice Gillig */
+  .bg-logo-navy {
+    background-color: #0a3a5b;
+  }
+
+  .bg-logo-navy-hover:hover {
+    background-color: #083048;
+  }
+
+  .bg-logo-green {
+    background-color: #0b7152;
+  }
+
+  .bg-logo-green-hover:hover {
+    background-color: #095a42;
+  }
+
+  .text-logo-navy {
+    color: #0a3a5b;
+  }
+
+  .text-logo-green {
+    color: #0b7152;
+  }
+
+  .border-logo-navy {
+    border-color: #0a3a5b;
+  }
+
+  .border-logo-green {
+    border-color: #0b7152;
+  }
+}
