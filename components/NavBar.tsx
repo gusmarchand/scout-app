@@ -11,7 +11,7 @@ export default function NavBar() {
   if (!session) return null
 
   return (
-    <nav className="bg-logo-navy text-white shadow">
+    <nav className="bg-logo-navy text-white shadow relative">
       <div className="px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link
@@ -54,7 +54,7 @@ export default function NavBar() {
         {/* Mobile Burger Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded hover:bg-white/10 transition-colors"
+          className="md:hidden p-2 rounded hover:bg-white/10 transition-colors relative z-50"
           aria-label="Menu"
         >
           <svg
@@ -82,48 +82,50 @@ export default function NavBar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-t border-white/20 bg-logo-navy">
-          <div className="px-4 py-3 flex flex-col gap-3">
+      {/* Mobile Menu - Overlay with smooth animation */}
+      <div
+        className={`md:hidden absolute top-full left-0 right-0 bg-logo-navy border-t border-white/20 shadow-lg z-40 overflow-hidden transition-all duration-300 ease-in-out ${
+          mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="px-4 py-3 flex flex-col gap-3">
+          <Link
+            href="/inventory"
+            className="py-2 hover:underline text-sm"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Inventaire
+          </Link>
+          <Link
+            href="/reservations/new"
+            className="py-2 hover:underline text-sm"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Réservation
+          </Link>
+          {session.user.role === 'admin' && (
             <Link
-              href="/inventory"
+              href="/admin/users"
               className="py-2 hover:underline text-sm"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Inventaire
+              Utilisateurs
             </Link>
-            <Link
-              href="/reservations/new"
-              className="py-2 hover:underline text-sm"
-              onClick={() => setMobileMenuOpen(false)}
+          )}
+          <div className="pt-3 border-t border-white/20 flex flex-col gap-2">
+            <span className="text-sm opacity-80">{session.user.name}</span>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false)
+                signOut({ callbackUrl: '/login' })
+              }}
+              className="bg-white text-logo-green px-3 py-2 rounded hover:bg-gray-100 font-medium text-sm self-start"
             >
-              Réservation
-            </Link>
-            {session.user.role === 'admin' && (
-              <Link
-                href="/admin/users"
-                className="py-2 hover:underline text-sm"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Utilisateurs
-              </Link>
-            )}
-            <div className="pt-3 border-t border-white/20 flex flex-col gap-2">
-              <span className="text-sm opacity-80">{session.user.name}</span>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  signOut({ callbackUrl: '/login' })
-                }}
-                className="bg-white text-logo-green px-3 py-2 rounded hover:bg-gray-100 font-medium text-sm self-start"
-              >
-                Déconnexion
-              </button>
-            </div>
+              Déconnexion
+            </button>
           </div>
         </div>
-      )}
+      </div>
     </nav>
   )
 }
