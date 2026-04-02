@@ -9,7 +9,8 @@ import InventoryClient from './InventoryClient'
 
 async function getCategories() {
   await connectDB()
-  return Category.find().lean() as any
+  const categories = await Category.find().lean()
+  return JSON.parse(JSON.stringify(categories))
 }
 
 async function getItems(categoryId = '', page = 1) {
@@ -18,10 +19,20 @@ async function getItems(categoryId = '', page = 1) {
   const skip = (page - 1) * limit
   const filter = categoryId ? { categoryId } : {}
   const [items, total] = await Promise.all([
-    Item.find(filter).sort({ priority: 1, name: 1 }).skip(skip).limit(limit).lean() as any,
+    Item.find(filter)
+      .select('_id name globalStatus type priority')
+      .sort({ priority: 1, name: 1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
     Item.countDocuments(filter),
   ])
-  return { items, total, page, totalPages: Math.ceil(total / limit) }
+  return {
+    items: JSON.parse(JSON.stringify(items)),
+    total,
+    page,
+    totalPages: Math.ceil(total / limit)
+  }
 }
 
 export default async function InventoryPage() {

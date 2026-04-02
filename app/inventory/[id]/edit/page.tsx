@@ -53,9 +53,25 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string 
   async function fetchItem() {
     if (!itemId) return
     setLoading(true)
-    const res = await fetch(`/api/equipment/items/${itemId}`)
-    if (res.ok) {
-      const data = await res.json()
+
+    try {
+      // Fetch en parallèle pour être 2x plus rapide
+      const [itemRes, categoriesRes] = await Promise.all([
+        fetch(`/api/equipment/items/${itemId}`),
+        fetch(`/api/equipment/categories`)
+      ])
+
+      if (!itemRes.ok) {
+        toast.error('Item introuvable')
+        router.push('/inventory')
+        return
+      }
+
+      const [data, categories] = await Promise.all([
+        itemRes.json(),
+        categoriesRes.ok ? categoriesRes.json() : []
+      ])
+
       setItem(data)
       setName(data.name)
       setType(data.type || '')
@@ -63,32 +79,29 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string 
       setNotes(data.notes || '')
 
       // Déterminer si c'est une tente
-      const categoryRes = await fetch(`/api/equipment/categories`)
-      if (categoryRes.ok) {
-        const categories = await categoryRes.json()
-        const category = categories.find((c: any) => c._id === data.categoryId)
-        const isTent = category?.name.toLowerCase().includes('tente')
-        setIsTentCategory(isTent)
+      const category = categories.find((c: any) => c._id === data.categoryId)
+      const isTent = category?.name.toLowerCase().includes('tente')
+      setIsTentCategory(isTent)
 
-        // Parser le type de tente
-        if (isTent && data.type) {
-          if (data.type.includes('classique')) {
-            setTentType('classique')
-            setTentPlaces(data.type.includes('8') ? '8' : '6')
-          } else if (data.type.includes('bateau')) {
-            setTentType('bateau')
-            setTentPlaces(data.type.includes('8') ? '8' : '6')
-          } else {
-            setTentType('autre')
-            setTentTypeAutre(data.type)
-          }
+      // Parser le type de tente
+      if (isTent && data.type) {
+        if (data.type.includes('classique')) {
+          setTentType('classique')
+          setTentPlaces(data.type.includes('8') ? '8' : '6')
+        } else if (data.type.includes('bateau')) {
+          setTentType('bateau')
+          setTentPlaces(data.type.includes('8') ? '8' : '6')
+        } else {
+          setTentType('autre')
+          setTentTypeAutre(data.type)
         }
       }
-    } else {
-      toast.error('Item introuvable')
+    } catch (error) {
+      toast.error('Erreur lors du chargement')
       router.push('/inventory')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   function computeTentType(): string {

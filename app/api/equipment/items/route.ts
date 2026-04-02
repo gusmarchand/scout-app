@@ -125,6 +125,7 @@ export async function GET(req: NextRequest) {
 
   const [items, total] = await Promise.all([
     Item.find(filter)
+      .select('_id name globalStatus type priority') // Seulement les champs affichés dans la liste
       .sort(sortOptions)
       .skip(skip)
       .limit(limit)

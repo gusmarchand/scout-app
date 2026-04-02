@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary'
 import type { Photo } from '@/types'
 
 interface Props {
@@ -89,11 +90,12 @@ export default function PhotoSection({ itemId, componentKey, photos: initialPhot
           {photos.map((photo) => (
             <div key={photo.publicId} className="relative group">
               <Image
-                src={photo.url}
+                src={optimizeCloudinaryUrl(photo.url, 160)}
                 alt={photo.caption ?? 'Photo'}
                 width={80}
                 height={80}
                 className="rounded object-cover w-20 h-20"
+                loading="lazy"
               />
               {canEdit && (
                 <button
