@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/authOptions'
 import { connectDB } from '@/lib/mongodb'
 import { Item } from '@/models/Item'
 import { Types } from 'mongoose'
@@ -18,8 +18,9 @@ const addPhotoSchema = z.object({
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string; key: string } }
+  props: { params: Promise<{ id: string; key: string }> }
 ) {
+  const params = await props.params
   const session = await getServerSession(authOptions)
 
   if (!session) {
@@ -44,7 +45,7 @@ export async function POST(
     return NextResponse.json({ error: 'Item introuvable.' }, { status: 404 })
   }
 
-  const component = item.components.find((c) => c.key === params.key)
+  const component = item.components.find((c: any) => c.key === params.key)
 
   if (!component) {
     return NextResponse.json({ error: 'Composant introuvable.' }, { status: 404 })

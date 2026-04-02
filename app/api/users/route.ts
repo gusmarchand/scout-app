@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/authOptions'
 import { connectDB } from '@/lib/mongodb'
 import { User } from '@/models/User'
 

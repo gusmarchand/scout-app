@@ -27,21 +27,22 @@ export async function POST(req: NextRequest) {
   }
 
   // Invalider les anciens tokens
-  await ResetToken.deleteMany({ userId: user._id })
+  const userDoc = user as unknown as { _id: any; email: string; name: string }
+  await ResetToken.deleteMany({ userId: userDoc._id })
 
   const token = crypto.randomBytes(32).toString('hex')
   const expiresAt = new Date(Date.now() + 1000 * 60 * 60) // 1h
 
-  await ResetToken.create({ userId: user._id, token, expiresAt })
+  await ResetToken.create({ userId: userDoc._id, token, expiresAt })
 
   const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`
 
   await resend.emails.send({
     from: 'Scout App <onboarding@resend.dev>',
-    to: user.email as string,
+    to: userDoc.email,
     subject: 'Réinitialisation de votre mot de passe',
     html: `
-      <p>Bonjour ${user.name},</p>
+      <p>Bonjour ${userDoc.name},</p>
       <p>Tu as demandé à réinitialiser ton mot de passe.</p>
       <p><a href="${resetUrl}" style="background:#15803d;color:white;padding:10px 20px;border-radius:6px;text-decoration:none;">Réinitialiser mon mot de passe</a></p>
       <p>Ce lien expire dans 1 heure.</p>

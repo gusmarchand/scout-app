@@ -7,7 +7,7 @@ const PhotoSchema = new Schema(
   {
     url: { type: String, required: true },
     publicId: { type: String, required: true },
-    uploadedBy: { type: Types.ObjectId, ref: 'User', required: true },
+    uploadedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     uploadedAt: { type: Date, default: Date.now },
     caption: { type: String },
   },
@@ -29,7 +29,7 @@ const ComponentSchema = new Schema(
 
 const ItemSchema = new Schema<ItemDocument>(
   {
-    categoryId: { type: Types.ObjectId, ref: 'Category', required: true },
+    categoryId: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
     name: { type: String, required: true, trim: true },
     type: { type: String },
     globalStatus: { type: String, enum: ['ok', 'moyen', 'ko'], required: true, default: 'ok' },
@@ -37,7 +37,7 @@ const ItemSchema = new Schema<ItemDocument>(
     components: { type: [ComponentSchema], default: [] },
     notes: { type: String, default: '' },
     updatedAt: { type: Date, default: Date.now },
-    updatedBy: { type: Types.ObjectId, ref: 'User', required: true },
+    updatedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: false }
 )

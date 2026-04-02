@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/authOptions'
 import { hasPermission } from '@/lib/auth'
 import { computePriority } from '@/lib/priority'
 import { connectDB } from '@/lib/mongodb'
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Non authentifié.' }, { status: 401 })
   }
 
-  if (!hasPermission(session.user as User, 'manage_equipment')) {
+  if (!hasPermission(session.user, 'manage_equipment')) {
     return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 })
   }
 
@@ -54,7 +54,8 @@ export async function POST(req: NextRequest) {
   }
 
   // Dériver les components depuis le componentTemplate de la catégorie
-  const components = category.componentTemplate.map((def) => ({
+  const categoryDoc = category as unknown as { componentTemplate: any[] }
+  const components = categoryDoc.componentTemplate.map((def: any) => ({
     key: def.key,
     label: def.label,
     status: 'ok' as const,

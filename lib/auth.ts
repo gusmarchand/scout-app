@@ -1,4 +1,4 @@
-import type { User, Action } from '@/types'
+import type { Action, Role } from '@/types'
 
 // Matrice de permissions par rôle
 const PERMISSIONS: Record<string, Action[]> = {
@@ -27,7 +27,7 @@ const PERMISSIONS: Record<string, Action[]> = {
  * Vérifie si un utilisateur est autorisé à effectuer une action donnée.
  * La vérification est basée sur la matrice de permissions définie par rôle.
  */
-export function hasPermission(user: User, action: Action): boolean {
+export function hasPermission(user: { role: Role }, action: Action): boolean {
   const allowed = PERMISSIONS[user.role]
   return allowed?.includes(action) ?? false
 }

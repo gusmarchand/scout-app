@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/authOptions'
 import { hasPermission } from '@/lib/auth'
 import { connectDB } from '@/lib/mongodb'
 import { Reservation } from '@/models/Reservation'
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Non authentifié.' }, { status: 401 })
   }
 
-  if (!hasPermission(session.user as User, 'create_reservation')) {
+  if (!hasPermission(session.user, 'create_reservation')) {
     return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 })
   }
 

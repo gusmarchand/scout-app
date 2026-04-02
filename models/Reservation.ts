@@ -5,9 +5,9 @@ export type ReservationDocument = Omit<IReservation, '_id'> & Document
 
 const ReservationSchema = new Schema<ReservationDocument>(
   {
-    itemId: { type: Types.ObjectId, ref: 'Item', required: true },
+    itemId: { type: Schema.Types.ObjectId, ref: 'Item', required: true },
     itemName: { type: String, required: true },
-    reservedBy: { type: Types.ObjectId, ref: 'User', required: true },
+    reservedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     unit: {
       type: String,
       enum: ['farfadets', 'louveteaux-jeannettes', 'scouts-guides', 'pionniers-caravelles', 'compagnons'],

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { v2 as cloudinary } from 'cloudinary'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/authOptions'
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -13,7 +13,7 @@ cloudinary.config({
 
 export async function GET(
   _req: NextRequest,
-  _ctx: { params: { id: string; key: string } }
+  _props: { params: Promise<{ id: string; key: string }> }
 ) {
   const session = await getServerSession(authOptions)
 

@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { redirect, notFound } from 'next/navigation'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/authOptions'
 import { connectDB } from '@/lib/mongodb'
 import { Item as ItemModel } from '@/models/Item'
 import StatusBadge from '../StatusBadge'
@@ -19,7 +19,8 @@ async function getItem(id: string): Promise<Item | null> {
   }
 }
 
-export default async function ItemDetailPage({ params }: { params: { id: string } }) {
+export default async function ItemDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 

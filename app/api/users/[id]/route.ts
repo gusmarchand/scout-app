@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/authOptions'
 import { connectDB } from '@/lib/mongodb'
 import { User } from '@/models/User'
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ) {
+  const params = await props.params
   const session = await getServerSession(authOptions)
 
   if (!session || session.user.role !== 'admin') {

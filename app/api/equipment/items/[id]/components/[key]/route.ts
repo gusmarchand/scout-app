@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/authOptions'
 import { hasPermission } from '@/lib/auth'
 import { connectDB } from '@/lib/mongodb'
 import { Item } from '@/models/Item'
@@ -20,15 +20,16 @@ const updateComponentSchema = z.object({
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string; key: string } }
+  props: { params: Promise<{ id: string; key: string }> }
 ) {
+  const params = await props.params
   const session = await getServerSession(authOptions)
 
   if (!session) {
     return NextResponse.json({ error: 'Non authentifié.' }, { status: 401 })
   }
 
-  if (!hasPermission(session.user as User, 'update_equipment_status')) {
+  if (!hasPermission(session.user, 'update_equipment_status')) {
     return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 })
   }
 
@@ -50,7 +51,7 @@ export async function PATCH(
     return NextResponse.json({ error: 'Item introuvable.' }, { status: 404 })
   }
 
-  const component = item.components.find((c) => c.key === params.key)
+  const component = item.components.find((c: any) => c.key === params.key)
 
   if (!component) {
     return NextResponse.json({ error: 'Composant introuvable.' }, { status: 404 })

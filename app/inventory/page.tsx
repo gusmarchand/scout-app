@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/authOptions'
 import { connectDB } from '@/lib/mongodb'
 import { Category } from '@/models/Category'
 import { Item } from '@/models/Item'
@@ -9,7 +9,7 @@ import InventoryClient from './InventoryClient'
 
 async function getCategories() {
   await connectDB()
-  return Category.find().lean()
+  return Category.find().lean() as any
 }
 
 async function getItems(categoryId = '', page = 1) {
@@ -18,7 +18,7 @@ async function getItems(categoryId = '', page = 1) {
   const skip = (page - 1) * limit
   const filter = categoryId ? { categoryId } : {}
   const [items, total] = await Promise.all([
-    Item.find(filter).sort({ priority: 1, name: 1 }).skip(skip).limit(limit).lean(),
+    Item.find(filter).sort({ priority: 1, name: 1 }).skip(skip).limit(limit).lean() as any,
     Item.countDocuments(filter),
   ])
   return { items, total, page, totalPages: Math.ceil(total / limit) }

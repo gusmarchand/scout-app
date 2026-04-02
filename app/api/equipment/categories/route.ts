@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/authOptions'
 import { hasPermission } from '@/lib/auth'
 import { connectDB } from '@/lib/mongodb'
 import { Category } from '@/models/Category'
