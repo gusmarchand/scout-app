@@ -89,17 +89,43 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const categoryId = searchParams.get('categoryId')
+  const search = searchParams.get('search')
+  const status = searchParams.get('status')
+  const sortBy = searchParams.get('sortBy') || 'name'
+  const sortOrder = searchParams.get('sortOrder') || 'asc'
   const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
   const limit = 20
   const skip = (page - 1) * limit
 
   await connectDB()
 
-  const filter = categoryId ? { categoryId } : {}
+  const filter: any = {}
+
+  if (categoryId) {
+    filter.categoryId = categoryId
+  }
+
+  if (search) {
+    filter.name = { $regex: search, $options: 'i' }
+  }
+
+  if (status) {
+    filter.globalStatus = status
+  }
+
+  // Déterminer le tri
+  const sortField = sortBy === 'status' ? 'priority' : 'name'
+  const sortDirection = sortOrder === 'desc' ? -1 : 1
+  const sortOptions: any = { [sortField]: sortDirection }
+
+  // Tri secondaire par nom si on trie par statut
+  if (sortBy === 'status') {
+    sortOptions.name = 1
+  }
 
   const [items, total] = await Promise.all([
     Item.find(filter)
-      .sort({ priority: 1, name: 1 })
+      .sort(sortOptions)
       .skip(skip)
       .limit(limit)
       .lean(),

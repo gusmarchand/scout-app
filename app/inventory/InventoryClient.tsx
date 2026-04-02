@@ -35,11 +35,19 @@ export default function InventoryClient({ categories, initialItems, initialCateg
   const [page, setPage] = useState(1)
   const [data, setData] = useState<PaginatedItems>(initialItems)
   const [loading, setLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<Status | ''>('')
+  const [sortBy, setSortBy] = useState<'name' | 'status'>('name')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
 
-  async function fetchItems(categoryId: string, p: number) {
+  async function fetchItems(categoryId: string, p: number, search?: string, status?: Status | '', sort?: string, order?: string) {
     setLoading(true)
     const params = new URLSearchParams({ page: String(p) })
     if (categoryId) params.set('categoryId', categoryId)
+    if (search) params.set('search', search)
+    if (status) params.set('status', status)
+    if (sort) params.set('sortBy', sort)
+    if (order) params.set('sortOrder', order)
     const res = await fetch(`/api/equipment/items?${params}`)
     if (res.ok) {
       const json = await res.json()
@@ -51,23 +59,92 @@ export default function InventoryClient({ categories, initialItems, initialCateg
   function handleCategoryChange(catId: string) {
     setSelectedCategory(catId)
     setPage(1)
-    fetchItems(catId, 1)
+    fetchItems(catId, 1, searchQuery, statusFilter, sortBy, sortOrder)
+  }
+
+  function handleSearch(query: string) {
+    setSearchQuery(query)
+    setPage(1)
+    fetchItems(selectedCategory, 1, query, statusFilter, sortBy, sortOrder)
+  }
+
+  function handleStatusFilter(status: Status | '') {
+    setStatusFilter(status)
+    setPage(1)
+    fetchItems(selectedCategory, 1, searchQuery, status, sortBy, sortOrder)
+  }
+
+  function handleSort(field: 'name' | 'status') {
+    const newOrder = sortBy === field && sortOrder === 'asc' ? 'desc' : 'asc'
+    setSortBy(field)
+    setSortOrder(newOrder)
+    fetchItems(selectedCategory, page, searchQuery, statusFilter, field, newOrder)
   }
 
   function handlePrev() {
     const p = page - 1
     setPage(p)
-    fetchItems(selectedCategory, p)
+    fetchItems(selectedCategory, p, searchQuery, statusFilter, sortBy, sortOrder)
   }
 
   function handleNext() {
     const p = page + 1
     setPage(p)
-    fetchItems(selectedCategory, p)
+    fetchItems(selectedCategory, p, searchQuery, statusFilter, sortBy, sortOrder)
   }
 
   return (
     <div>
+      {/* Barre de recherche */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="🔍 Rechercher un item..."
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0b7152] text-sm"
+        />
+      </div>
+
+      {/* Filtres */}
+      <div className="mb-4 flex flex-wrap gap-3">
+        {/* Filtre par statut */}
+        <select
+          value={statusFilter}
+          onChange={(e) => handleStatusFilter(e.target.value as Status | '')}
+          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0b7152]"
+        >
+          <option value="">Tous les statuts</option>
+          <option value="ok">OK</option>
+          <option value="moyen">Moyen</option>
+          <option value="ko">KO</option>
+        </select>
+
+        {/* Tri */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleSort('name')}
+            className={`px-3 py-2 border rounded-lg text-sm font-medium transition-colors ${
+              sortBy === 'name'
+                ? 'bg-logo-green text-white border-logo-green'
+                : 'bg-white text-gray-700 border-gray-300 hover:border-green-500'
+            }`}
+          >
+            Nom {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+          </button>
+          <button
+            onClick={() => handleSort('status')}
+            className={`px-3 py-2 border rounded-lg text-sm font-medium transition-colors ${
+              sortBy === 'status'
+                ? 'bg-logo-green text-white border-logo-green'
+                : 'bg-white text-gray-700 border-gray-300 hover:border-green-500'
+            }`}
+          >
+            Statut {sortBy === 'status' && (sortOrder === 'asc' ? '↑' : '↓')}
+          </button>
+        </div>
+      </div>
+
       {/* Filtre par catégorie */}
       <div className="flex flex-wrap gap-2 mb-6">
         <button
