@@ -58,11 +58,15 @@ export default async function ReservationsPage() {
       manualLeaders: firstItem.manualLeaders || [],
       items,
     }
-  }).sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
+  })
 
   const now = new Date()
-  const upcoming = events.filter(e => e.endDate >= now)
-  const past = events.filter(e => e.endDate < now)
+  const upcoming = events
+    .filter(e => e.endDate >= now)
+    .sort((a, b) => a.startDate.getTime() - b.startDate.getTime()) // Plus proche en premier
+  const past = events
+    .filter(e => e.endDate < now)
+    .sort((a, b) => b.startDate.getTime() - a.startDate.getTime()) // Plus récent en premier
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8">

@@ -11,7 +11,6 @@ import ComponentForm from './ComponentForm'
 import PhotoSection from './PhotoSection'
 import DeleteButton from './DeleteButton'
 import CopyButton from './CopyButton'
-import QRCodeButton from './QRCodeButton'
 import type { Item, Component} from '@/types'
 
 async function getItem(id: string): Promise<Item | null> {
@@ -42,18 +41,17 @@ export default async function ItemDetailPage(props: { params: Promise<{ id: stri
           { label: item.name },
         ]}
       />
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mb-2">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-gray-900">{item.name}</h1>
           <StatusBadge status={item.globalStatus} />
         </div>
         {canEdit && (
-          <div className="flex items-center gap-2">
-            <QRCodeButton itemId={String(item._id)} itemName={item.name} />
-            <CopyButton itemId={String(item._id)} itemName={item.name} />
+          <div className="flex flex-wrap items-center gap-2">
+            <CopyButton itemId={String(item._id)} itemName={item.name} className="flex-shrink-0" />
             <Link
               href={`/inventory/${item._id}/edit`}
-              className="px-4 py-2 bg-logo-green text-white rounded-lg text-sm font-medium bg-logo-green-hover transition-colors"
+              className="flex-1 min-w-fit sm:flex-none px-4 py-2 bg-logo-green text-white rounded-lg text-sm font-medium bg-logo-green-hover transition-colors text-center"
             >
               ✏️ Modifier
             </Link>

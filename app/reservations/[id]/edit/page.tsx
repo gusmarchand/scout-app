@@ -233,12 +233,12 @@ export default function EditReservationPage({ params }: { params: Promise<{ id: 
 
       {/* Section Matériel réservé */}
       <div className="bg-white rounded-xl shadow p-5 mb-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800">Matériel réservé</h2>
           <button
             type="button"
             onClick={handleShowAddItems}
-            className="px-3 py-1 bg-logo-green text-white rounded text-sm hover:bg-logo-green-hover"
+            className="w-full sm:w-auto px-3 py-1 bg-logo-green text-white rounded text-sm hover:bg-logo-green-hover"
           >
             + Ajouter du matériel
           </button>
@@ -265,8 +265,8 @@ export default function EditReservationPage({ params }: { params: Promise<{ id: 
 
         {/* Modal Ajouter des items */}
         {showAddItems && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-5 max-w-md w-full max-h-96 overflow-y-auto">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+            <div className="bg-white rounded-lg p-4 sm:p-5 max-w-md w-full max-h-[80vh] sm:max-h-96 overflow-y-auto">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Ajouter du matériel</h3>
                 <button
@@ -333,7 +333,7 @@ export default function EditReservationPage({ params }: { params: Promise<{ id: 
         </div>
 
         {/* Nombre d'enfants */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Nombre de filles <span className="text-xs text-gray-500">(facultatif)</span>
@@ -368,7 +368,7 @@ export default function EditReservationPage({ params }: { params: Promise<{ id: 
             Chefs présents <span className="text-xs text-gray-500">(facultatif)</span>
           </label>
           {allUsers.length > 0 && (
-            <div className="mb-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2">
+            <div className="mb-2 max-h-48 sm:max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2">
               {allUsers.map(user => (
                 <label key={user._id} className="flex items-center gap-2 py-1 hover:bg-gray-50 px-2 rounded cursor-pointer">
                   <input
@@ -429,18 +429,18 @@ export default function EditReservationPage({ params }: { params: Promise<{ id: 
         </div>
 
         {/* Boutons */}
-        <div className="flex gap-2 justify-end mt-4">
+        <div className="flex flex-col-reverse sm:flex-row gap-2 sm:justify-end mt-4">
           <button
             type="button"
             onClick={() => router.push('/reservations')}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50"
+            className="w-full sm:w-auto px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50"
           >
             Annuler
           </button>
           <button
             type="submit"
             disabled={submitting}
-            className="px-4 py-2 bg-logo-green text-white rounded-lg text-sm hover:bg-logo-green-hover disabled:opacity-50"
+            className="w-full sm:w-auto px-4 py-2 bg-logo-green text-white rounded-lg text-sm hover:bg-logo-green-hover disabled:opacity-50"
           >
             {submitting ? 'Enregistrement...' : 'Enregistrer'}
           </button>

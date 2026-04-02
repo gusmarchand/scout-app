@@ -121,7 +121,7 @@ export default function InventoryClient({ categories, initialItems, initialCateg
   return (
     <div>
       {/* Barre de recherche et export */}
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex flex-col sm:flex-row gap-2">
         <input
           type="search"
           placeholder="🔍 Rechercher un item... (raccourci: /)"
@@ -137,12 +137,12 @@ export default function InventoryClient({ categories, initialItems, initialCateg
       </div>
 
       {/* Filtres */}
-      <div className="mb-4 flex flex-wrap gap-3">
+      <div className="mb-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
         {/* Filtre par statut */}
         <select
           value={statusFilter}
           onChange={(e) => handleStatusFilter(e.target.value as Status | '')}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0b7152]"
+          className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0b7152]"
         >
           <option value="">Tous les statuts</option>
           <option value="ok">OK</option>
@@ -154,7 +154,7 @@ export default function InventoryClient({ categories, initialItems, initialCateg
         <div className="flex gap-2">
           <button
             onClick={() => handleSort('name')}
-            className={`px-3 py-2 border rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-1 sm:flex-none px-3 py-2 border rounded-lg text-sm font-medium transition-colors ${
               sortBy === 'name'
                 ? 'bg-logo-green text-white border-logo-green'
                 : 'bg-white text-gray-700 border-gray-300 hover:border-green-500'
@@ -164,7 +164,7 @@ export default function InventoryClient({ categories, initialItems, initialCateg
           </button>
           <button
             onClick={() => handleSort('status')}
-            className={`px-3 py-2 border rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-1 sm:flex-none px-3 py-2 border rounded-lg text-sm font-medium transition-colors ${
               sortBy === 'status'
                 ? 'bg-logo-green text-white border-logo-green'
                 : 'bg-white text-gray-700 border-gray-300 hover:border-green-500'
@@ -225,7 +225,7 @@ export default function InventoryClient({ categories, initialItems, initialCateg
             <li key={item._id}>
               <Link
                 href={`/inventory/${item._id}`}
-                className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 py-3 hover:bg-gray-50 transition-colors"
               >
                 <div>
                   <span className="font-medium text-gray-900">{item.name}</span>
@@ -242,21 +242,21 @@ export default function InventoryClient({ categories, initialItems, initialCateg
 
       {/* Pagination */}
       {data.totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex flex-col sm:flex-row items-center gap-3 sm:justify-between mt-4">
           <button
             onClick={handlePrev}
             disabled={page <= 1}
-            className="px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40"
+            className="w-full sm:w-auto px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40"
           >
             ← Précédent
           </button>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-gray-600 order-first sm:order-none">
             Page {page} / {data.totalPages}
           </span>
           <button
             onClick={handleNext}
             disabled={page >= data.totalPages}
-            className="px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40"
+            className="w-full sm:w-auto px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40"
           >
             Suivant →
           </button>

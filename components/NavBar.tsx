@@ -42,7 +42,7 @@ export default function NavBar() {
           <img
             src="/icons/nag_logo.png"
             alt="Logo Alice Gillig"
-            className="w-8 h-8 object-contain"
+            className="w-10 h-10 object-contain"
           />
           <span className="hidden sm:inline">Matos Alice Gillig</span>
         </Link>
@@ -75,11 +75,11 @@ export default function NavBar() {
         <button
           ref={buttonRef}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded hover:bg-white/10 transition-colors relative z-50"
+          className="md:hidden p- rounded hover:bg-white/10 transition-colors relative z-50"
           aria-label={mobileMenuOpen ? "Fermer le menu" : "Menu"}
         >
           <svg
-            className="w-6 h-6"
+            className="w-8 h-8"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

@@ -119,14 +119,14 @@ export default function NewItemPage() {
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Ajouter du matériel</h1>
-        <button onClick={() => router.push('/inventory')} className="text-sm text-logo-green hover:underline">
+        <button onClick={() => router.push('/inventory')} className="self-start sm:self-auto text-sm text-logo-green hover:underline">
           ← Retour à l&apos;inventaire
         </button>
       </div>
 
-      <div className="flex gap-2 mb-6">
+      <div className="grid grid-cols-2 gap-2 mb-6">
         {(['item', 'category'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2 rounded-lg text-sm font-medium ${tab === t ? 'bg-logo-green text-white' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'}`}
@@ -165,7 +165,7 @@ export default function NewItemPage() {
               <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Type de tente</label>
-                  <div className="flex gap-4">
+                  <div className="flex flex-col xs:flex-row gap-4">
                     {(['classique', 'bateau', 'autre'] as TentType[]).map(t => (
                       <label key={t} className="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="tentType" value={t} checked={tentType === t}
@@ -185,7 +185,7 @@ export default function NewItemPage() {
                 {tentType !== 'autre' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Nombre de places</label>
-                    <div className="flex gap-4">
+                    <div className="flex flex-col xs:flex-row gap-4">
                       {(['6', '8'] as const).map(p => (
                         <label key={p} className="flex items-center gap-2 cursor-pointer">
                           <input type="radio" name="tentPlaces" value={p} checked={tentPlaces === p}
@@ -249,16 +249,16 @@ export default function NewItemPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Composants</label>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-3">
                 {components.map((comp, i) => (
-                  <div key={i} className="flex gap-2 items-center">
+                  <div key={i} className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center border sm:border-0 border-gray-200 p-3 sm:p-0 rounded-lg sm:rounded-none">
                     <input type="text" placeholder="Clé (ex: toit)" value={comp.key}
                       onChange={e => { const c = [...components]; c[i].key = e.target.value.toLowerCase().replace(/\s+/g, '_'); setComponents(c) }}
-                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                     <input type="text" placeholder="Label (ex: Toit)" value={comp.label}
                       onChange={e => { const c = [...components]; c[i].label = e.target.value; setComponents(c) }}
-                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                     <label className="flex items-center gap-1 text-xs text-gray-600 whitespace-nowrap">
                       <input type="checkbox" checked={comp.isQuantified}
@@ -267,7 +267,7 @@ export default function NewItemPage() {
                     </label>
                     {components.length > 1 && (
                       <button type="button" onClick={() => setComponents(components.filter((_, j) => j !== i))}
-                        className="text-red-500 hover:text-red-700 text-lg leading-none"
+                        className="sm:ml-auto text-red-500 hover:text-red-700 text-lg leading-none self-end sm:self-auto"
                       >×</button>
                     )}
                   </div>

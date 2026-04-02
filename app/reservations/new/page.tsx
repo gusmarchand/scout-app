@@ -200,19 +200,22 @@ export default function NewReservationPage() {
       <section className="bg-white rounded-xl shadow p-5 mb-6">
         <h2 className="text-base font-semibold text-gray-800 mb-3">Période</h2>
         <form onSubmit={handleCheckAvailability} className="flex flex-col gap-4">
-          <div className="flex justify-center">
-            <DayPicker
-              mode="range"
-              selected={range}
-              onSelect={setRange}
-              locale={fr}
-              disabled={{ before: new Date() }}
-              numberOfMonths={1}
-              styles={{
-                day_selected: { backgroundColor: '#15803d' },
-                day_range_middle: { backgroundColor: '#dcfce7' },
-              }}
-            />
+          <div className="flex justify-center overflow-x-auto">
+            <div className="min-w-fit">
+              <DayPicker
+                mode="range"
+                selected={range}
+                onSelect={setRange}
+                locale={fr}
+                disabled={{ before: new Date() }}
+                numberOfMonths={1}
+                className="scale-90 sm:scale-100"
+                styles={{
+                  day_selected: { backgroundColor: '#15803d' },
+                  day_range_middle: { backgroundColor: '#dcfce7' },
+                }}
+              />
+            </div>
           </div>
 
           {range?.from && (
@@ -252,23 +255,23 @@ export default function NewReservationPage() {
                 const badge = STATUS_BADGE[item.globalStatus]
                 const isSelected = selectedItemIds.includes(item._id)
                 return (
-                  <li key={item._id} className="py-2 flex items-center gap-3">
+                  <li key={item._id} className="py-2 flex items-start gap-3">
                     <input
                       type="checkbox"
                       id={`item-${item._id}`}
                       checked={isSelected}
                       onChange={() => toggleItemSelection(item._id)}
-                      className="accent-[#0b7152] w-4 h-4"
+                      className="accent-[#0b7152] w-4 h-4 mt-1 flex-shrink-0"
                     />
-                    <label htmlFor={`item-${item._id}`} className="flex-1 cursor-pointer">
+                    <label htmlFor={`item-${item._id}`} className="flex-1 min-w-0 cursor-pointer">
                       <span className="font-medium text-sm">{item.name}</span>
                       {item.type && <span className="ml-2 text-xs text-gray-500">{item.type}</span>}
                     </label>
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badge.className}`}>
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${badge.className}`}>
                       {badge.label}
                     </span>
                     {item.globalStatus === 'ko' && (
-                      <span className="text-xs text-red-600 font-medium">⚠️ KO</span>
+                      <span className="text-xs text-red-600 font-medium flex-shrink-0">⚠️ KO</span>
                     )}
                   </li>
                 )
@@ -307,7 +310,7 @@ export default function NewReservationPage() {
             </div>
 
             {/* Nombre d'enfants */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nombre de filles <span className="text-xs text-gray-500">(facultatif)</span>
@@ -334,7 +337,7 @@ export default function NewReservationPage() {
                 Chefs présents <span className="text-xs text-gray-500">(facultatif)</span>
               </label>
               {allUsers.length > 0 && (
-                <div className="mb-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2">
+                <div className="mb-2 max-h-48 sm:max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2">
                   {allUsers.map(user => (
                     <label key={user._id} className="flex items-center gap-2 py-1 hover:bg-gray-50 px-2 rounded cursor-pointer">
                       <input
