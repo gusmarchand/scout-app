@@ -11,8 +11,13 @@ export default function NavBar() {
   return (
     <nav className="bg-green-700 text-white px-4 py-3 flex items-center justify-between shadow">
       <div className="flex items-center gap-6">
-        <Link href="/" className="font-bold text-lg tracking-tight">
-          🏕️ Scout App
+        <Link href="/" className="flex items-center gap-2 font-bold text-lg tracking-tight">
+          <img
+            src="/icons/nag_logo.png"
+            alt="Logo Alice Gillig"
+            className="w-8 h-8 object-contain"
+          />
+          <span>Matos Alice Gillig</span>
         </Link>
         <Link href="/inventory" className="hover:underline text-sm">
           Inventaire

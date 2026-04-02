@@ -5,14 +5,21 @@ import NavBar from '@/components/NavBar'
 import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
-  title: 'Scout Group App',
-  description: 'Gestion du matériel de camp pour groupes scouts',
+  title: 'Matos Alice Gillig',
+  description: 'Gestion du matériel de camp - Groupe Alice Gillig',
   manifest: '/manifest.json',
   themeColor: '#15803d',
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Scout App',
+    title: 'Matos Alice Gillig',
   },
 }
 
