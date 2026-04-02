@@ -32,7 +32,7 @@ export default async function ItemDetailPage(props: { params: Promise<{ id: stri
   const item = await getItem(params.id)
   if (!item) notFound()
 
-  const canEdit = session.user.role === 'admin' || session.user.role === 'equipier'
+  const canEdit = session.user.role === 'admin' || session.user.role === 'equipier' || session.user.role === 'chef'
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">

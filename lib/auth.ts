@@ -18,6 +18,7 @@ const PERMISSIONS: Record<string, Action[]> = {
     'cancel_any_reservation',
   ],
   chef: [
+    'update_equipment_status',
     'upload_photo',
     'create_reservation',
   ],

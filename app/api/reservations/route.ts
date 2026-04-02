@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
   setImmediate(async () => {
     try {
       const { sendEmail, getEquipmentTeam } = await import('@/lib/email')
-      const { reservationCreatedTemplate, reservationNotificationToEquipmentTeam } = await import('@/lib/email-templates')
+      const { reservationCreatedTemplate, reservationNotificationToEquipmentTeam, reservationModifiedTemplate } = await import('@/lib/email-templates')
       const { User } = await import('@/models/User')
 
       // Récupérer l'utilisateur créateur
@@ -126,7 +126,6 @@ export async function POST(req: NextRequest) {
       const creator = creatorDoc ? JSON.parse(JSON.stringify(creatorDoc)) : null
 
       if (creator) {
-        // 1. Email de confirmation au chef créateur (seulement pour la première réservation de l'événement)
         // Vérifier si c'est la première réservation pour cet événement
         const existingReservations = await Reservation.find({
           eventName,
@@ -136,7 +135,7 @@ export async function POST(req: NextRequest) {
         }).lean()
 
         if (existingReservations.length === 1) {
-          // C'est la première réservation de cet événement, envoyer la confirmation
+          // 1. Email de confirmation au chef créateur (première réservation)
           const allEventReservations = await Reservation.find({
             eventName,
             startDate,
@@ -158,19 +157,10 @@ export async function POST(req: NextRequest) {
               numberOfBoys,
             })
           })
-        }
 
-        // 2. Email aux équipiers (seulement pour la première réservation)
-        if (existingReservations.length === 1) {
+          // 2. Email aux équipiers (première réservation)
           const equipmentTeam = await getEquipmentTeam()
           if (equipmentTeam.length > 0) {
-            const allEventReservations = await Reservation.find({
-              eventName,
-              startDate,
-              endDate,
-              reservedBy,
-            }).select('itemName').lean()
-
             await sendEmail({
               to: equipmentTeam.map((u: any) => u.email),
               subject: `Nouvelle réservation - ${eventName}`,
@@ -183,6 +173,18 @@ export async function POST(req: NextRequest) {
               })
             })
           }
+        } else {
+          // Ajout d'un item à une réservation existante
+          await sendEmail({
+            to: creator.email,
+            subject: `Modification de votre réservation - ${eventName}`,
+            html: reservationModifiedTemplate({
+              chefName: creator.name,
+              eventName,
+              changes: [`Ajout du matériel : ${itemName}`],
+              modifiedBy: creator.name,
+            })
+          })
         }
       }
     } catch (error) {
