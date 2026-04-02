@@ -14,6 +14,7 @@ const UserSchema = new Schema<UserDocument>(
       enum: ['farfadets', 'louveteaux-jeannettes', 'scouts-guides', 'pionniers-caravelles', 'compagnons'],
       required: false,
     },
+    isEquipmentManager: { type: Boolean, default: false },  // Responsable matériel
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: false }

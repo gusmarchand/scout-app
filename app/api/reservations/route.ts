@@ -114,6 +114,82 @@ export async function POST(req: NextRequest) {
     manualLeaders,
   })
 
+  // Envoyer les emails de notification (de manière asynchrone, sans bloquer la réponse)
+  setImmediate(async () => {
+    try {
+      const { sendEmail, getEquipmentTeam } = await import('@/lib/email')
+      const { reservationCreatedTemplate, reservationNotificationToEquipmentTeam } = await import('@/lib/email-templates')
+      const { User } = await import('@/models/User')
+
+      // Récupérer l'utilisateur créateur
+      const creatorDoc = await User.findById(reservedBy).select('email name').lean()
+      const creator = creatorDoc ? JSON.parse(JSON.stringify(creatorDoc)) : null
+
+      if (creator) {
+        // 1. Email de confirmation au chef créateur (seulement pour la première réservation de l'événement)
+        // Vérifier si c'est la première réservation pour cet événement
+        const existingReservations = await Reservation.find({
+          eventName,
+          startDate,
+          endDate,
+          reservedBy,
+        }).lean()
+
+        if (existingReservations.length === 1) {
+          // C'est la première réservation de cet événement, envoyer la confirmation
+          const allEventReservations = await Reservation.find({
+            eventName,
+            startDate,
+            endDate,
+            reservedBy,
+          }).select('itemName').lean()
+
+          await sendEmail({
+            to: creator.email,
+            subject: `Réservation confirmée - ${eventName}`,
+            html: reservationCreatedTemplate({
+              chefName: creator.name,
+              eventName,
+              startDate,
+              endDate,
+              location,
+              items: allEventReservations.map(r => r.itemName),
+              numberOfGirls,
+              numberOfBoys,
+            })
+          })
+        }
+
+        // 2. Email aux équipiers (seulement pour la première réservation)
+        if (existingReservations.length === 1) {
+          const equipmentTeam = await getEquipmentTeam()
+          if (equipmentTeam.length > 0) {
+            const allEventReservations = await Reservation.find({
+              eventName,
+              startDate,
+              endDate,
+              reservedBy,
+            }).select('itemName').lean()
+
+            await sendEmail({
+              to: equipmentTeam.map((u: any) => u.email),
+              subject: `Nouvelle réservation - ${eventName}`,
+              html: reservationNotificationToEquipmentTeam({
+                chefName: creator.name,
+                eventName,
+                startDate,
+                endDate,
+                items: allEventReservations.map(r => r.itemName),
+              })
+            })
+          }
+        }
+      }
+    } catch (error) {
+      console.error('[EMAIL] Erreur lors de l\'envoi des notifications:', error)
+    }
+  })
+
   return NextResponse.json(reservation.toObject(), { status: 201 })
 }
 

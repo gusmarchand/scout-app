@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`
 
   await resend.emails.send({
-    from: 'Matos Scout SGDF <noreply@alice-gillig-sgdf.fr>',
+    from: process.env.RESEND_FROM_EMAIL || 'Matos Scout SGDF <noreply@alice-gillig-sgdf.fr>',
     to: userDoc.email,
     subject: 'Réinitialisation de votre mot de passe',
     html: `

@@ -22,6 +22,7 @@ export interface User {
   passwordHash: string
   role: Role
   unit?: Unit
+  isEquipmentManager?: boolean  // Flag pour responsable matériel (équipiers uniquement)
   createdAt: Date
 }
 
