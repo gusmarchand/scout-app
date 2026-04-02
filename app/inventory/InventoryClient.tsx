@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import StatusBadge from './StatusBadge'
 import type { Status } from '@/types'
@@ -36,9 +36,34 @@ export default function InventoryClient({ categories, initialItems, initialCateg
   const [data, setData] = useState<PaginatedItems>(initialItems)
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<Status | ''>('')
   const [sortBy, setSortBy] = useState<'name' | 'status'>('name')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
+
+  // Debounce search query
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearch(searchQuery)
+    }, 300)
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+    }
+  }, [searchQuery])
+
+  // Trigger search when debounced value changes
+  useEffect(() => {
+    setPage(1)
+    fetchItems(selectedCategory, 1, debouncedSearch, statusFilter, sortBy, sortOrder)
+  }, [debouncedSearch])
 
   async function fetchItems(categoryId: string, p: number, search?: string, status?: Status | '', sort?: string, order?: string) {
     setLoading(true)
@@ -59,38 +84,37 @@ export default function InventoryClient({ categories, initialItems, initialCateg
   function handleCategoryChange(catId: string) {
     setSelectedCategory(catId)
     setPage(1)
-    fetchItems(catId, 1, searchQuery, statusFilter, sortBy, sortOrder)
+    fetchItems(catId, 1, debouncedSearch, statusFilter, sortBy, sortOrder)
   }
 
   function handleSearch(query: string) {
     setSearchQuery(query)
-    setPage(1)
-    fetchItems(selectedCategory, 1, query, statusFilter, sortBy, sortOrder)
+    // Le debounce se charge de déclencher la recherche
   }
 
   function handleStatusFilter(status: Status | '') {
     setStatusFilter(status)
     setPage(1)
-    fetchItems(selectedCategory, 1, searchQuery, status, sortBy, sortOrder)
+    fetchItems(selectedCategory, 1, debouncedSearch, status, sortBy, sortOrder)
   }
 
   function handleSort(field: 'name' | 'status') {
     const newOrder = sortBy === field && sortOrder === 'asc' ? 'desc' : 'asc'
     setSortBy(field)
     setSortOrder(newOrder)
-    fetchItems(selectedCategory, page, searchQuery, statusFilter, field, newOrder)
+    fetchItems(selectedCategory, page, debouncedSearch, statusFilter, field, newOrder)
   }
 
   function handlePrev() {
     const p = page - 1
     setPage(p)
-    fetchItems(selectedCategory, p, searchQuery, statusFilter, sortBy, sortOrder)
+    fetchItems(selectedCategory, p, debouncedSearch, statusFilter, sortBy, sortOrder)
   }
 
   function handleNext() {
     const p = page + 1
     setPage(p)
-    fetchItems(selectedCategory, p, searchQuery, statusFilter, sortBy, sortOrder)
+    fetchItems(selectedCategory, p, debouncedSearch, statusFilter, sortBy, sortOrder)
   }
 
   return (
@@ -174,7 +198,19 @@ export default function InventoryClient({ categories, initialItems, initialCateg
 
       {/* Liste des items */}
       {loading ? (
-        <p className="text-gray-500 text-sm">Chargement…</p>
+        <div className="bg-white rounded-xl shadow divide-y divide-gray-200">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="px-4 py-3 animate-pulse">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+                  <div className="h-3 bg-gray-100 rounded w-1/4"></div>
+                </div>
+                <div className="h-6 w-16 bg-gray-200 rounded-full"></div>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : data.items.length === 0 ? (
         <p className="text-gray-500 text-sm">Aucun item trouvé.</p>
       ) : (

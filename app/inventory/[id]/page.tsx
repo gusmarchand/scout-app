@@ -4,11 +4,12 @@ import Link from 'next/link'
 import { authOptions } from '@/lib/authOptions'
 import { connectDB } from '@/lib/mongodb'
 import { Item as ItemModel } from '@/models/Item'
+import Breadcrumbs from '@/components/Breadcrumbs'
 import StatusBadge from '../StatusBadge'
 import ItemStatusForm from './ItemStatusForm'
 import ComponentForm from './ComponentForm'
 import PhotoSection from './PhotoSection'
-import type { Item, Component } from '@/types'
+import type { Item, Component} from '@/types'
 
 async function getItem(id: string): Promise<Item | null> {
   try {
@@ -32,6 +33,12 @@ export default async function ItemDetailPage(props: { params: Promise<{ id: stri
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
+      <Breadcrumbs
+        items={[
+          { label: 'Inventaire', href: '/inventory' },
+          { label: item.name },
+        ]}
+      />
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-gray-900">{item.name}</h1>

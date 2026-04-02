@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import Breadcrumbs from '@/components/Breadcrumbs'
 import type { Status } from '@/types'
 
 interface Item {
@@ -137,6 +138,13 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string 
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8">
+      <Breadcrumbs
+        items={[
+          { label: 'Inventaire', href: '/inventory' },
+          { label: item.name, href: `/inventory/${itemId}` },
+          { label: 'Modifier' },
+        ]}
+      />
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Modifier l'item</h1>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow p-6 flex flex-col gap-4">
