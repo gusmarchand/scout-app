@@ -10,8 +10,8 @@ import { Reservation } from '@/models/Reservation'
 
 const availableItemsSchema = z.object({
   categoryId: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
-  start: z.string().datetime(),
-  end: z.string().datetime(),
+  start: z.string().min(1),
+  end: z.string().min(1),
 }).refine((data) => new Date(data.start) < new Date(data.end), {
   message: 'La date de début doit être antérieure à la date de fin.',
   path: ['start'],
