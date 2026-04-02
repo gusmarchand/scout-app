@@ -15,6 +15,14 @@ const updateItemSchema = z.object({
   updatedBy: z.string().optional(),
 })
 
+const fullUpdateItemSchema = z.object({
+  name: z.string().min(1).optional(),
+  type: z.string().optional(),
+  globalStatus: z.enum(['ok', 'moyen', 'ko']).optional(),
+  notes: z.string().optional(),
+  updatedBy: z.string().min(1),
+})
+
 // ─── GET /api/equipment/items/:id ─────────────────────────────────────────────
 
 export async function GET(
@@ -86,6 +94,56 @@ export async function PATCH(
   }
 
   item.updatedBy = session.user.id as unknown as typeof item.updatedBy
+  item.updatedAt = new Date()
+
+  await item.save()
+
+  return NextResponse.json(item.toObject())
+}
+
+// ─── PUT /api/equipment/items/:id ────────────────────────────────────────────
+
+export async function PUT(
+  req: NextRequest,
+  props: { params: Promise<{ id: string }> }
+) {
+  const params = await props.params
+  const session = await getServerSession(authOptions)
+
+  if (!session) {
+    return NextResponse.json({ error: 'Non authentifié.' }, { status: 401 })
+  }
+
+  if (!hasPermission(session.user, 'manage_equipment')) {
+    return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 })
+  }
+
+  const body = await req.json()
+  const parsed = fullUpdateItemSchema.safeParse(body)
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Données invalides.', details: parsed.error.flatten() },
+      { status: 400 }
+    )
+  }
+
+  const { name, type, globalStatus, notes, updatedBy } = parsed.data
+
+  await connectDB()
+
+  const item = await Item.findById(params.id)
+
+  if (!item) {
+    return NextResponse.json({ error: 'Item introuvable.' }, { status: 404 })
+  }
+
+  if (name !== undefined) item.name = name
+  if (type !== undefined) item.type = type
+  if (globalStatus !== undefined) item.globalStatus = globalStatus
+  if (notes !== undefined) item.notes = notes
+
+  item.updatedBy = updatedBy as unknown as typeof item.updatedBy
   item.updatedAt = new Date()
 
   await item.save()

@@ -1,5 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { redirect, notFound } from 'next/navigation'
+import Link from 'next/link'
 import { authOptions } from '@/lib/authOptions'
 import { connectDB } from '@/lib/mongodb'
 import { Item as ItemModel } from '@/models/Item'
@@ -31,9 +32,19 @@ export default async function ItemDetailPage(props: { params: Promise<{ id: stri
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
-      <div className="flex items-center gap-3 mb-2">
-        <h1 className="text-2xl font-bold text-gray-900">{item.name}</h1>
-        <StatusBadge status={item.globalStatus} />
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-900">{item.name}</h1>
+          <StatusBadge status={item.globalStatus} />
+        </div>
+        {canEdit && (
+          <Link
+            href={`/inventory/${item._id}/edit`}
+            className="px-4 py-2 bg-logo-green text-white rounded-lg text-sm font-medium bg-logo-green-hover transition-colors"
+          >
+            ✏️ Modifier l'item
+          </Link>
+        )}
       </div>
       {item.notes && <p className="text-sm text-gray-600 mb-6">{item.notes}</p>}
 
