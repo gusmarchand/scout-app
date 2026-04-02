@@ -53,7 +53,22 @@ ItemSchema.pre('save', function (next) {
   next()
 })
 
+// ─── Indexes pour optimiser les requêtes ─────────────────────────────────────
+
 // Index composé pour le tri et la recherche par catégorie
 ItemSchema.index({ categoryId: 1, priority: 1 })
+
+// Index pour la recherche par nom (case-insensitive)
+ItemSchema.index({ name: 'text' })
+
+// Index pour le tri par nom
+ItemSchema.index({ name: 1 })
+
+// Index pour le filtre par statut
+ItemSchema.index({ globalStatus: 1 })
+
+// Index composé pour filtres combinés (catégorie + statut + tri)
+ItemSchema.index({ categoryId: 1, globalStatus: 1, priority: 1 })
+ItemSchema.index({ categoryId: 1, globalStatus: 1, name: 1 })
 
 export const Item = models.Item ?? model<ItemDocument>('Item', ItemSchema)

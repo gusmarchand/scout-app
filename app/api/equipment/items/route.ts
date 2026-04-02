@@ -106,7 +106,8 @@ export async function GET(req: NextRequest) {
   }
 
   if (search) {
-    filter.name = { $regex: search, $options: 'i' }
+    // Utilise l'index text pour recherche plus rapide
+    filter.$text = { $search: search }
   }
 
   if (status) {

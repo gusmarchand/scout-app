@@ -20,8 +20,17 @@ const ReservationSchema = new Schema<ReservationDocument>(
   { timestamps: false }
 )
 
+// ─── Indexes pour optimiser les requêtes ─────────────────────────────────────
+
 // Index composé pour les requêtes de disponibilité
 ReservationSchema.index({ itemId: 1, startDate: 1, endDate: 1 })
+
+// Index pour rechercher les réservations d'un utilisateur
+ReservationSchema.index({ reservedBy: 1, startDate: -1 })
+
+// Index pour rechercher par dates (upcoming reservations)
+ReservationSchema.index({ startDate: 1 })
+ReservationSchema.index({ endDate: 1 })
 
 export const Reservation =
   models.Reservation ?? model<ReservationDocument>('Reservation', ReservationSchema)

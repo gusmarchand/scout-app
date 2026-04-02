@@ -19,6 +19,9 @@ const createCategorySchema = z.object({
   componentTemplate: z.array(componentDefSchema),
 })
 
+// Cache la réponse pendant 1 heure (les catégories changent rarement)
+export const revalidate = 3600
+
 export async function GET() {
   const session = await getServerSession(authOptions)
 

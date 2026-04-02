@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import SessionProviderWrapper from '@/components/SessionProviderWrapper'
+import QueryProvider from '@/components/QueryProvider'
 import NavBar from '@/components/NavBar'
 import { Toaster } from 'sonner'
 
@@ -38,11 +39,13 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="min-h-screen bg-gray-50">
-        <SessionProviderWrapper>
-          <NavBar />
-          {children}
-          <Toaster position="top-right" richColors />
-        </SessionProviderWrapper>
+        <QueryProvider>
+          <SessionProviderWrapper>
+            <NavBar />
+            {children}
+            <Toaster position="top-right" richColors />
+          </SessionProviderWrapper>
+        </QueryProvider>
       </body>
     </html>
   )

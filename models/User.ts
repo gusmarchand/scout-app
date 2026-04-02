@@ -19,4 +19,12 @@ const UserSchema = new Schema<UserDocument>(
   { timestamps: false }
 )
 
+// ─── Indexes pour optimiser les requêtes ─────────────────────────────────────
+
+// Index unique sur email (déjà défini dans le schema mais explicité)
+UserSchema.index({ email: 1 }, { unique: true })
+
+// Index pour rechercher par role
+UserSchema.index({ role: 1 })
+
 export const User = models.User ?? model<UserDocument>('User', UserSchema)
