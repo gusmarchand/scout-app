@@ -32,11 +32,19 @@ export default function NewReservationPage() {
   const [availError, setAvailError] = useState('')
   const [searched, setSearched] = useState(false)
 
-  const [selectedItemId, setSelectedItemId] = useState('')
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([])
   const [eventName, setEventName] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const [submitSuccess, setSubmitSuccess] = useState(false)
+
+  function toggleItemSelection(itemId: string) {
+    setSelectedItemIds(prev =>
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    )
+  }
 
   if (status === 'loading') return null
   if (!session) { router.replace('/login'); return null }
@@ -49,7 +57,7 @@ export default function NewReservationPage() {
     setAvailError('')
     setAvailableItems([])
     setSearched(false)
-    setSelectedItemId('')
+    setSelectedItemIds([])
 
     if (!startDate || !endDate) {
       setAvailError('Veuillez sélectionner une période de début et de fin.')
@@ -73,49 +81,70 @@ export default function NewReservationPage() {
   async function handleReserve(e: React.FormEvent) {
     e.preventDefault()
     setSubmitError('')
-    if (!selectedItemId) { setSubmitError('Veuillez sélectionner un item.'); return }
+    if (selectedItemIds.length === 0) { setSubmitError('Veuillez sélectionner au moins un item.'); return }
     if (!eventName.trim()) { setSubmitError("Veuillez saisir le nom de l'événement."); return }
 
     setSubmitting(true)
-    const res = await fetch('/api/reservations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        itemId: selectedItemId,
-        itemName: availableItems.find(i => i._id === selectedItemId)?.name ?? '',
-        eventName: eventName.trim(),
-        startDate,
-        endDate,
-        unit: session?.user.unit ?? undefined,
-      }),
-    })
-    setSubmitting(false)
 
-    if (res.ok) {
-      setSubmitSuccess(true)
-    } else {
-      const err = await res.json().catch(() => ({}))
-      if (res.status === 409) {
-        setSubmitError(`Conflit : cet item est déjà réservé sur cette période.`)
+    // Créer une réservation pour chaque item sélectionné
+    const reservations = selectedItemIds.map(itemId => ({
+      itemId,
+      itemName: availableItems.find(i => i._id === itemId)?.name ?? '',
+      eventName: eventName.trim(),
+      startDate,
+      endDate,
+      unit: session?.user.unit ?? undefined,
+    }))
+
+    try {
+      const results = await Promise.all(
+        reservations.map(reservation =>
+          fetch('/api/reservations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reservation),
+          })
+        )
+      )
+
+      const failedReservations = results.filter(r => !r.ok)
+
+      if (failedReservations.length > 0) {
+        const firstError = await failedReservations[0].json().catch(() => ({}))
+        setSubmitError(firstError.error ?? `${failedReservations.length} réservation(s) ont échoué`)
       } else {
-        setSubmitError(err.error ?? 'Erreur lors de la réservation.')
+        setSubmitSuccess(true)
       }
+    } catch (error) {
+      setSubmitError('Erreur lors de la réservation.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
   if (submitSuccess) {
     return (
       <main className="max-w-2xl mx-auto px-4 py-8 text-center">
-        <p className="text-logo-green text-lg font-semibold mb-4">✅ Réservation confirmée !</p>
-        <button
-          onClick={() => {
-            setSubmitSuccess(false); setSelectedItemId(''); setEventName('')
-            setAvailableItems([]); setSearched(false); setRange(undefined)
-          }}
-          className="text-sm text-logo-green hover:underline"
-        >
-          Faire une autre réservation
-        </button>
+        <p className="text-logo-green text-lg font-semibold mb-4">
+          ✅ {selectedItemIds.length} réservation{selectedItemIds.length > 1 ? 's' : ''} confirmée{selectedItemIds.length > 1 ? 's' : ''} !
+        </p>
+        <div className="flex gap-3 justify-center">
+          <button
+            onClick={() => router.push('/reservations')}
+            className="bg-logo-green text-white px-4 py-2 rounded-lg text-sm hover:bg-logo-green-hover"
+          >
+            Voir mes réservations
+          </button>
+          <button
+            onClick={() => {
+              setSubmitSuccess(false); setSelectedItemIds([]); setEventName('')
+              setAvailableItems([]); setSearched(false); setRange(undefined)
+            }}
+            className="text-sm text-logo-green hover:underline"
+          >
+            Nouvelle réservation
+          </button>
+        </div>
       </main>
     )
   }
@@ -171,14 +200,22 @@ export default function NewReservationPage() {
           {availableItems.length === 0 ? (
             <p className="text-sm text-gray-500">Aucun item disponible sur cette période.</p>
           ) : (
-            <ul className="divide-y divide-gray-200">
+            <>
+              <div className="mb-3 text-sm text-gray-600">
+                Sélectionnez un ou plusieurs items ({selectedItemIds.length} sélectionné{selectedItemIds.length > 1 ? 's' : ''})
+              </div>
+              <ul className="divide-y divide-gray-200">
               {availableItems.map(item => {
                 const badge = STATUS_BADGE[item.globalStatus]
+                const isSelected = selectedItemIds.includes(item._id)
                 return (
                   <li key={item._id} className="py-2 flex items-center gap-3">
-                    <input type="radio" name="selectedItem" value={item._id}
-                      id={`item-${item._id}`} checked={selectedItemId === item._id}
-                      onChange={() => setSelectedItemId(item._id)} className="accent-[#0b7152]"
+                    <input
+                      type="checkbox"
+                      id={`item-${item._id}`}
+                      checked={isSelected}
+                      onChange={() => toggleItemSelection(item._id)}
+                      className="accent-[#0b7152] w-4 h-4"
                     />
                     <label htmlFor={`item-${item._id}`} className="flex-1 cursor-pointer">
                       <span className="font-medium text-sm">{item.name}</span>
@@ -193,7 +230,8 @@ export default function NewReservationPage() {
                   </li>
                 )
               })}
-            </ul>
+              </ul>
+            </>
           )}
         </section>
       )}
@@ -217,10 +255,13 @@ export default function NewReservationPage() {
                 {submitError}
               </p>
             )}
-            <button type="submit" disabled={submitting || !selectedItemId}
+            <button type="submit" disabled={submitting || selectedItemIds.length === 0}
               className="self-start bg-logo-green text-white px-4 py-2 rounded-lg text-sm bg-logo-green-hover disabled:opacity-50"
             >
-              {submitting ? 'Réservation en cours…' : 'Confirmer la réservation'}
+              {submitting
+                ? 'Réservation en cours…'
+                : `Réserver ${selectedItemIds.length} item${selectedItemIds.length > 1 ? 's' : ''}`
+              }
             </button>
           </form>
         </section>

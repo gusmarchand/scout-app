@@ -52,8 +52,8 @@ export default function NavBar() {
           <Link href="/inventory" className="hover:underline text-sm">
             Inventaire
           </Link>
-          <Link href="/reservations/new" className="hover:underline text-sm">
-            Réservation
+          <Link href="/reservations" className="hover:underline text-sm">
+            Réservations
           </Link>
           {session.user.role === 'admin' && (
             <Link href="/admin/users" className="hover:underline text-sm">
@@ -120,11 +120,11 @@ export default function NavBar() {
             Inventaire
           </Link>
           <Link
-            href="/reservations/new"
+            href="/reservations"
             className="py-2 hover:underline text-sm"
             onClick={() => setMobileMenuOpen(false)}
           >
-            Réservation
+            Réservations
           </Link>
           {session.user.role === 'admin' && (
             <Link
