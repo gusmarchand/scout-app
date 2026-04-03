@@ -24,7 +24,7 @@ async function cleanKoReservations() {
     koItems.forEach(item => console.log(`   - ${item.name} (${item._id})`))
 
     // Extraire les IDs
-    const koItemIds = koItems.map(item => item._id.toString())
+    const koItemIds = koItems.map(item => String(item._id))
 
     // Trouver toutes les réservations concernées
     const reservationsToDelete = await Reservation.find({

@@ -48,7 +48,7 @@ export default async function ItemDetailPage(props: { params: Promise<{ id: stri
         </div>
         {canEdit && (
           <div className="flex flex-wrap items-center gap-2">
-            <CopyButton itemId={String(item._id)} itemName={item.name} className="flex-shrink-0" />
+            <CopyButton itemId={String(item._id)} itemName={item.name} />
             <Link
               href={`/inventory/${item._id}/edit`}
               className="flex-1 min-w-fit sm:flex-none px-4 py-2 bg-logo-green text-white rounded-lg text-sm font-medium bg-logo-green-hover transition-colors text-center"
